@@ -8,6 +8,7 @@ reg_param  = 1e-3
 
 
 def get_samples(x, y, sn, train_index, test_index, n_sample, k,if_mean = False, ):
+    # 获取训练集中具有缺失数据的k个最近样本集合。
     """
     Retrieve the set of the k nearest samples with missing data on the training dataset.
     :param x: dataset: view_num * (dataset_num, dim,)
@@ -21,26 +22,28 @@ def get_samples(x, y, sn, train_index, test_index, n_sample, k,if_mean = False, 
     """
 
     view_num = len(x)
-    data_num = x[0].shape[0]
+    data_num = x[0].shape[0]#第一个视图的样本数
 
+    # 计算每个视图中所有样本之间的欧氏距离
     print("calculate distance")
     dist_all_set = [cdist(x[i], x[i], 'euclidean') for i in range(view_num)]
 
-
+    
     dismiss_view_index = [[np.array([]) for __ in range(view_num)] for _ in range(view_num)]
     for i in range(view_num-1):
         for j in range(i+1, view_num):
-            sn_temp = sn[:,[i,j]]
+            # i和j视图中都存在的样本索引，即视作完整样本
+            sn_temp = sn[:,[i,j]] # sn_temp: (dataset_num, 2)第i和j视图的缺失数据索引
             sn_temp_sum = np.sum(sn_temp, axis=1)
             sn_temp_sum[test_index] = 0 # Mask the test set sample
             dismiss_view_index[i][j] = dismiss_view_index[j][i] = np.where(sn_temp_sum == 2)[0] # Sample index that exists in both views i and j
 
     print("Fill the missing views in the training set")
-    # step1: obtain the training set
+    # step1: 获取训练集
     sn_train = sn[train_index]
     x_train = [x[v][train_index] for v in range(view_num)]
     y_train = y[train_index]
-    # step2: obtain sample points for each class on each view
+    # step2: obtain sample points for each class on each view在每个视图上获取每个类的样本点
     class_num = np.max(y) + 1
     means, covs, num = dict(), dict(),dict()
     for v in range(view_num):
@@ -53,13 +56,13 @@ def get_samples(x, y, sn, train_index, test_index, n_sample, k,if_mean = False, 
             num_v.append(present_index_class.shape[0])
         means[v], covs[v], num[v] = means_v, covs_v, num_v
 
-    # step3: screen complete samples
+    # step3: screen complete samples 浏览完整样本
     x_train_dissmiss_index = np.where(np.sum(sn_train, axis=1) == view_num)[0]
     x_complete = [x_train[_][x_train_dissmiss_index] for _ in range(view_num)]
     y_complete = y_train[x_train_dissmiss_index]
     sn_complete = sn_train[x_train_dissmiss_index]
 
-    # step4: fill incomplete samples
+    # step4: 填充不完整视图
     x_train_miss_index = np.where(np.sum(sn_train, axis=1) < view_num)[0]
     x_incomplete = [np.repeat(x_train[_][x_train_miss_index], n_sample ,axis=0) for _ in range(view_num)]
     y_incomplete = np.repeat(y_train[x_train_miss_index], n_sample, axis=0)
@@ -70,12 +73,13 @@ def get_samples(x, y, sn, train_index, test_index, n_sample, k,if_mean = False, 
         miss_view_index = np.nonzero(sn_train[i] == 0)[0]
         for v in miss_view_index:
             rng = np.random.default_rng()
-            cov = covs[v][y_i] + np.eye(len(covs[v][y_i])) * reg_param  # add regularization parameter to ensure non-singularity
-            L = np.linalg.cholesky(cov)
-            samples_v = rng.normal(size=(n_sample, len(cov))) @ L.T + means[v][y_i]
+            cov = covs[v][y_i] + np.eye(len(covs[v][y_i])) * reg_param  # 添加正则化参数以确保非单位性
+            L = np.linalg.cholesky(cov) # Cholesky分解，得到下三角矩阵
+            samples_v = rng.normal(size=(n_sample, len(cov))) @ L.T + means[v][y_i] # 生成服从多元正态分布的样本
 
-            x_incomplete[v][index*n_sample:(index+1)*n_sample] = samples_v
+            x_incomplete[v][index*n_sample:(index+1)*n_sample] = samples_v # 填充缺失视图
         index+=1
+
     x_train = [np.concatenate((x_complete[_], x_incomplete[_]), axis=0) for _ in range(view_num)]
     x_train = process_data(x_train, view_num)
     y_train = np.concatenate((y_complete, y_incomplete), axis=0)

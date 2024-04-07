@@ -36,11 +36,13 @@ def ce_loss(p, alpha, c, global_step, annealing_step):
 
 
 class UGC(nn.Module):
+    # UGC model:Unsupervised Generative Classification 无监督生成分类器
     def __init__(self, classes, views, classifier_dims, annealing_epochs=1):
         super(UGC, self).__init__()
         self.views = views
         self.classes = classes
         self.annealing_epochs = annealing_epochs
+        # 初始化多视图分类器,每个视图都有一个独立的分类器
         self.Net = nn.ModuleList([Net(classifier_dims[i], self.classes) for i in range(self.views)])
 
     def DS_Combin(self, alpha):
@@ -55,6 +57,9 @@ class UGC(nn.Module):
             :param alpha2: Dirichlet distribution parameters of view 2
             :return: Combined Dirichlet distribution parameters
             """
+            # 融合公式：
+            # b^a = (b^0 * b^1 + b^0 * u^1 + b^1 * u^0) / (1 - C)
+            # u^a = u^0 * u^1 / (1 - C)
             alpha = dict()
             alpha[0], alpha[1] = alpha1, alpha2
             b, S, E, u = dict(), dict(), dict(), dict()
@@ -92,6 +97,7 @@ class UGC(nn.Module):
             return alpha_a
 
         for v in range(len(alpha)-1):
+            # 依次将每个视图的 alpha 参数组合成一个
             if v==0:
                 alpha_a = DS_Combin_two(alpha[0], alpha[1])
             else:
@@ -100,7 +106,7 @@ class UGC(nn.Module):
 
     def classify(self, input , y, global_step, sn):
         # pretrain
-        evidence, sigma = self.collect(input)
+        evidence, sigma = self.collect(input) 
         loss_class = 0
         alpha = dict()
         for v_num in range(self.views):
@@ -141,6 +147,7 @@ class UGC(nn.Module):
         :param input: Multi-view data
         :return: evidence of every view
         """
+        # 为每个视图生成证据（evidence）
         evidence = dict()
         for v_num in range(self.views):
             evidence[v_num] = self.Net[v_num](input[v_num])
@@ -153,23 +160,31 @@ class Net(nn.Module):
     def __init__(self, classifier_dims, classes):
         super(Net, self).__init__()
         self.classes = classes
+        # 该模型是一个全连接网络，用于在 TMC 模型中作为每个视图的分类器。
+        # 这个网络只有两层，一个是全连接层，一个是证据层
+
         self.fc = nn.ModuleList()
         self.fc.append(nn.Linear(classifier_dims[0], 64))
         self.fc.append(nn.Sigmoid())
 
+        # 证据通过将sigmoid/softmax替换为softplus（或ReLU）来获得
+        # “softmax 本质上提供了预测分布的单点估计，即使在错误预测的情况下也会导致过度自信的输出”
+        # 证据是指从输入中收集的用于支持分类的指标，并且与狄利克雷分布的浓度参数密切相关
         self.evidence = nn.ModuleList()
         self.evidence.append(nn.Linear(64, classes))
         self.evidence.append(nn.Softplus())
 
 
     def forward(self, x):
-
-        out = self.fc[0](x)
+        
+        out = self.fc[0](x) # linear
         for i in range(1, len(self.fc)):
-            out = self.fc[i](out)
-
+            out = self.fc[i](out) # 激活
+        
         evidence = self.evidence[0](out)
         evidence = self.evidence[1](evidence)
 
+        # 平方操作可以强化模型对于高置信度预测的信任度，同时减少对于低置信度预测的信任度。
+        # 一个小于1的数的平方会变得更小，而一个大于1的数的平方会变得更大。
         return evidence*evidence
 
