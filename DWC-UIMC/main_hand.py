@@ -10,7 +10,9 @@ from util import mv_dataset, read_mymat, build_ad_dataset, process_data, get_val
 import warnings
 from EarlyStopping_hand import EarlyStopping
 from collections import Counter
-from select_k_neighbors import get_samples
+# 导入原来的方法和新的方法
+from select_k_neighbors import get_samples as get_samples_gaussian
+from compare_methods import get_samples as get_samples_distance
 
 warnings.filterwarnings("ignore")
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
@@ -69,7 +71,10 @@ if __name__ == "__main__":
                         help='if mean [default: True]')
     parser.add_argument('--latent-dim', type=int, default=64, metavar='LR',
                         help='latent layer dimension [default: True]')
+    parser.add_argument('--method', type=str, default='gaussian', choices=['gaussian', 'distance'],
+                    help='method to use for getting samples [default: gaussian]')
     args = parser.parse_args()
+    args.cuda = False  # Disable CUDA
 
     args.decoder_dims = [[240], [76], [216], [47], [64], [6]]
     args.encoder_dims = [[240], [76], [216], [47], [64], [6]]
@@ -82,6 +87,13 @@ if __name__ == "__main__":
     partition = build_ad_dataset(Y, p=0.8, seed=999)
 
     X = process_data(X, view_num)
+
+    # 根据选择的方法来获取样本
+    if args.method == 'gaussian':
+        get_samples = get_samples_gaussian
+    else:
+        get_samples = get_samples_distance
+
     X_train, Y_train, X_test, Y_test, Sn_train = get_samples(x=X, y=Y, sn=Sn,
                                                    train_index=partition['train'],
                                                    test_index=partition['test'],
@@ -103,6 +115,8 @@ if __name__ == "__main__":
 
     if args.cuda:
         model.cuda()
+    else:
+        model.cpu()
 
 
     def pretrain(epoch):
@@ -110,9 +124,16 @@ if __name__ == "__main__":
         loss_meter = AverageMeter()
         for batch_idx, (data, sn, target) in enumerate(train_loader):
             for v_num in range(len(data)):
-                data[v_num] = Variable(data[v_num].float().cuda())
-            target = Variable(target.long().cuda())
-            sn = Variable(sn.long().cuda())
+                if args.cuda:
+                    data[v_num] = Variable(data[v_num].float().cuda())
+                else:
+                    data[v_num] = Variable(data[v_num].float().cpu())
+            if args.cuda:
+                target = Variable(target.long().cuda())
+                sn = Variable(sn.long().cuda())
+            else:
+                target = Variable(target.long().cpu())
+                sn = Variable(sn.long().cpu())
             # refresh the optimizer
             optimizer.zero_grad()
             loss = model.classify(data, target, epoch, sn)
@@ -121,16 +142,23 @@ if __name__ == "__main__":
             optimizer.step()
             loss_meter.update(loss.item())
         print('Pretrain Epoch: {} \tLoss: {:.6f}'.format(epoch, loss_meter.avg))
-
+    
 
     def train(epoch):
         model.train()
         loss_meter = AverageMeter()
         for batch_idx, (data, sn, target) in enumerate(train_loader):
             for v_num in range(len(data)):
-                data[v_num] = Variable(data[v_num].float().cuda())
-            target = Variable(target.long().cuda())
-            sn = Variable(sn.long().cuda())
+                if args.cuda:
+                    data[v_num] = Variable(data[v_num].float().cuda())
+                else:
+                    data[v_num] = Variable(data[v_num].float().cpu())
+            if args.cuda:
+                target = Variable(target.long().cuda())
+                sn = Variable(sn.long().cuda())
+            else:
+                target = Variable(target.long().cpu())
+                sn = Variable(sn.long().cpu())
             # refresh the optimizer
             optimizer.zero_grad()
             evidences, evidence_a, loss = model(data, target, epoch, batch_idx, sn)
@@ -149,8 +177,14 @@ if __name__ == "__main__":
         data_num, correct_num = 0, 0
         for batch_idx, (data, target) in enumerate(dataloader):
             for v_num in range(len(data)):
-                data[v_num] = Variable(data[v_num].float().cuda())
-            target = Variable(target.long().cuda())
+                if args.cuda:
+                    data[v_num] = Variable(data[v_num].float().cuda())
+                else:
+                    data[v_num] = Variable(data[v_num].float().cpu())
+            if args.cuda:
+                target = Variable(target.long().cuda())
+            else:
+                target = Variable(target.long().cpu())
             data_num += target.size(0)
             with torch.no_grad():
                 evidence, evidences = model(data, target, epoch, batch_idx, data, 1)
@@ -179,6 +213,6 @@ if __name__ == "__main__":
 
 
     with open("./test-hand.txt", "a") as f:
-        text = "\tmissing_rate:" + str(missing_rate) + "\taccuracy:" + str(acc) +"\n"
+        text = "\tmethod:" + args.method + "\tmissing_rate:" + str(missing_rate) + "\taccuracy:" + str(acc) +"\n"
         f.write(text)
     f.close()

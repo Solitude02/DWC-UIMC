@@ -8,55 +8,28 @@ reg_param  = 1e-3
 
 
 def get_samples(x, y, sn, train_index, test_index, n_sample, k, if_mean=False, reg_param=1e-6):
-    # 用于获取处理过的样本数据。
-    # x: 数据集: view_num * (dataset_num, dim,)
-    # y: 标签: (dataset_num,)
-    # sn: 缺失索引矩阵: (dataset_num, view_num,)
-    # 如果 sn 矩阵中的某个元素为1，那么表示对应的视图是完整的；如果为0，那么表示对应的视图是不完整的。
-    # train_index: 训练集索引: (train_num,)
-    # test_index: 测试集索引: (test_num,)
-    # n_sample: 采样频率，用于实现“多次采样填充缺失视图”
-    # k: 邻居数量
-    # if_mean: 是否使用均值填充缺失视图
-    # reg_param: 正则化参数
-
-    view_num = len(x) # 视图数量
-    data_num = x[0].shape[0]  # 第一个视图的样本数
+    view_num = len(x)
+    data_num = x[0].shape[0]
 
     # 计算每个视图中所有样本之间的欧氏距离
     print("计算距离")
     dist_all_set = [cdist(x[i], x[i], 'euclidean') for i in range(view_num)]
+
     # 构造一个 view_num*view_num 的列表，每个元素是一个数组，表示第i和j视图中都存在的所有样本的索引
     dismiss_view_index = [[np.array([]) for __ in range(view_num)] for _ in range(view_num)]
     # 计算每个视图中都存在的样本索引
-
     for i in range(view_num - 1):
         for j in range(i + 1, view_num):
             # i和j视图中都存在的样本索引，即完整样本
-            sn_temp = sn[:, [i, j]]  # sn_temp: (dataset_num, 2)选取sn的第i和j列，即第i和j视图的缺失数据索引
-            sn_temp_sum = np.sum(sn_temp, axis=1) # 求和，得到每个样本的缺失视图数量
-            sn_temp_sum[test_index] = 0  # 掩盖测试集样本，即”测试集样本不参与计算“
+            sn_temp = sn[:, [i, j]]
+            sn_temp_sum = np.sum(sn_temp, axis=1)
+            sn_temp_sum[test_index] = 0
             dismiss_view_index[i][j] = dismiss_view_index[j][i] = np.where(sn_temp_sum == 2)[0]
-            # sn_temp_sum == 2 表示两个视图都缺失
 
-    print("使用多元高斯分布填充训练集中的缺失视图")
-    # step1: 获取训练集
-    sn_train = sn[train_index] # sn_train：(train_num, view_num)，记录第train_num个样本的缺失视图
-    x_train = [x[v][train_index] for v in range(view_num)] # x_train: 
-    y_train = y[train_index] # y_train:
-    # step2: 在每个视图上获取每个类的样本点
-    class_num = np.max(y) + 1
-    means, covs, num = dict(), dict(), dict()
-    for v in range(view_num):
-        present_index = np.where(sn_train[:, v] == 1)[0]
-        means_v, covs_v, num_v = [], [], []
-        for c in range(class_num):
-            present_index_class = np.where(y_train[present_index] == c)[0]
-            means_v.append(np.mean(x_train[v][present_index_class], axis=0))
-            covs_v.append(np.cov(x_train[v][present_index_class], rowvar=0))
-            num_v.append(present_index_class.shape[0])
-        means[v], covs[v], num[v] = means_v, covs_v, num_v
-        # means形式为：{第v个视图：[第c个类的均值，第c+1个类的均值，...], 第v+1个视图：[第c个类的均值，第c+1个类的均值，...], ...}
+    print("使用距离分配权重填充训练集中的缺失视图")
+    sn_train = sn[train_index]
+    x_train = [x[v][train_index] for v in range(view_num)]
+    y_train = y[train_index]
 
     # step3: 筛选完整样本
     x_train_dissmiss_index = np.where(np.sum(sn_train, axis=1) == view_num)[0]
@@ -76,12 +49,15 @@ def get_samples(x, y, sn, train_index, test_index, n_sample, k, if_mean=False, r
         # np.nonzero(sn_train[i] == 0)返回sn_train[i]中为0的索引
         # nonzero的作用是返回数组a中非零元素的索引值数组
         for v in miss_view_index:
-            rng = np.random.default_rng()
-            cov = covs[v][y_i] + np.eye(len(covs[v][y_i])) * reg_param  # 添加正则化参数以确保非单位性
-            L = np.linalg.cholesky(cov)  # Cholesky分解，得到下三角矩阵
-            samples_v = rng.normal(size=(n_sample, len(cov))) @ L.T + means[v][y_i]  # 生成服从多元正态分布的样本
-
-            x_incomplete[v][index * n_sample:(index + 1) * n_sample] = samples_v  # 填充缺失视图
+            # 计算样本与其他样本的距离
+            dist_v = dist_all_set[v][i]
+            # 根据距离计算权重
+            weights = np.exp(-dist_v / np.max(dist_v)) # 距离越近，权重越大
+            # 对权重进行归一化
+            weights = weights / np.sum(weights)
+            # 随机采样
+            chosen_indices = np.random.choice(data_num, n_sample, p=weights)
+            x_incomplete[v][index * n_sample:(index + 1) * n_sample] = x[v][chosen_indices]
         index += 1
 
     x_train = [np.concatenate((x_complete[_], x_incomplete[_]), axis=0) for _ in range(view_num)]
@@ -89,7 +65,7 @@ def get_samples(x, y, sn, train_index, test_index, n_sample, k, if_mean=False, r
     y_train = np.concatenate((y_complete, y_incomplete), axis=0)
     Sn_train = np.concatenate((sn_complete, sn_incomplete), axis=0)
 
-    print("基于多元高斯分布填充测试集中的缺失视图")
+    print("基于距离填充测试集中的缺失视图")
     # 填充测试集时，只考虑训练集中存在的视图
     sn_test = sn[test_index]
     x_test_dissmiss_index = np.where(np.sum(sn_test, axis=1) == view_num)[0]
@@ -127,19 +103,30 @@ def get_samples(x, y, sn, train_index, test_index, n_sample, k, if_mean=False, r
                     dismiss_view_index_temp = dismiss_view_index[j][jj]  # 第j和jj个视图都存在的样本索引
                     dist_temp = np.full(data_num, np.inf) # 初始化距离
                     dist_temp[dismiss_view_index_temp] = dist_all_set[jj][i, dismiss_view_index_temp] # 计算距离
+                    dist_temp[i] = np.inf  # 将自己与自己的距离设置为无穷大，排除自己作为邻居
                     nearest_index_temp = np.argpartition(dist_temp, k)[:k] # 获取最近的k个邻居
                     # np.argpartition(a, k)会返回一个新的数组，其中前 k 个元素是 dist_temp 中最小的 k 个元素的索引
                     neighbors_index_temp = np.unique(
                         np.concatenate((neighbors_index_temp, nearest_index_temp), ))  # 连接所有存在的视图
 
-                x_neighbors_temp = x[j][neighbors_index_temp] # 补全第j个视图的邻居集
-                mean = np.mean(x_neighbors_temp, axis=0) # 计算均值
-                cov = np.cov(x_neighbors_temp, rowvar=0) # 计算协方差
-                rng = np.random.default_rng() # 随机数生成器
-                cov = cov + np.eye(len(cov)) * reg_param # 添加正则化参数
-                L = np.linalg.cholesky(cov) # Cholesky分解
-                x_samples_temp = rng.normal(size=(n_sample, len(cov))) @ L.T + mean # 生成服从多元正态分布的样本
-                x_i[j] = x_samples_temp # 填充缺失视图
+                # 从近邻集中基于距离随机采样填充缺失视图
+                for v in x_miss_view_index.flat:
+                    rng = np.random.default_rng() # 随机数生成器
+                    x_i[v] = x[v][neighbors_index_temp]
+                    y_i = y[neighbors_index_temp]
+                    # 计算概率
+                    dist_temp_nonzero = dist_temp[neighbors_index_temp].copy()
+                    dist_temp_nonzero[dist_temp_nonzero == 0] = 1e-10  # 将0值替换为一个非常小的值
+                    probabilities = 1/dist_temp_nonzero
+                    # 归一化概率
+                    probabilities /= probabilities.sum()
+                    selected_indices = rng.choice(x_i[v].shape[0], size=n_sample, replace=True, p=probabilities)
+                    x_i[v] = x_i[v][selected_indices] # 随机选取n_sample个样本
+
+                # # 从近邻集中随机采样填充缺失视图
+                # for _ in range(n_sample):
+                #     sampled_index = np.random.choice(neighbors_index_temp) # 从邻居索引中随机选择一个样本
+                #     x_i[j][_] = x[j][sampled_index] # 使用选中的样本的视图数据填充缺失视图
 
             x_test = [np.concatenate((x_test[_], x_i[_]), axis=0) for _ in range(view_num)] # 连接所有视图
             y_test = np.concatenate((y_test, y_i), axis=0) # 连接所有标签

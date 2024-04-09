@@ -9,8 +9,8 @@ import matplotlib.pyplot as plt
 
 # loss function
 def KL(alpha, c):
-    beta = torch.ones((1, c)).cuda()
-    # beta = torch.ones((1, c))
+    # beta = torch.ones((1, c)).cuda()
+    beta = torch.ones((1, c))
     S_alpha = torch.sum(alpha, dim=1, keepdim=True)
     S_beta = torch.sum(beta, dim=1, keepdim=True)
     lnB = torch.lgamma(S_alpha) - torch.sum(torch.lgamma(alpha), dim=1, keepdim=True)
