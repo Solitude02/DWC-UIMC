@@ -36,7 +36,7 @@ def ce_loss(p, alpha, c, global_step, annealing_step):
 
 
 class UGC(nn.Module):
-    # UGC model:Unsupervised Generative Classification 无监督生成分类器
+    # 多视图分类器
     def __init__(self, classes, views, classifier_dims, annealing_epochs=1):
         super(UGC, self).__init__()
         self.views = views
@@ -105,8 +105,8 @@ class UGC(nn.Module):
         return alpha_a
 
     def classify(self, input , y, global_step, sn):
-        # pretrain
-        evidence, sigma = self.collect(input) 
+        # 预训练
+        evidence, sigma = self.collect(input) # evidence: 每个视图的证据，sigma: 每个视图的方差
         loss_class = 0
         alpha = dict()
         for v_num in range(self.views):
@@ -114,10 +114,11 @@ class UGC(nn.Module):
             alpha[v_num] = evidence[v_num] + 1
             loss_class += ce_loss(y, alpha[v_num], self.classes, global_step, self.annealing_epochs) * sn_v
         loss_class = torch.mean(loss_class)
-        return loss_class
+        return loss_class # 返回分类器损失
 
 
     def forward(self, input, y, global_step, batch_idx, sn, if_test=0):
+        # 前向传播
         if(if_test):
             evidence = self.collect(input)
             alpha = dict()

@@ -1,60 +1,61 @@
 import numpy as np
 from scipy.spatial.distance import cdist
-from util import read_mymat, process_data, build_ad_dataset
-import matplotlib.pyplot as plt
+from select_k_neighbors import get_samples as get_samples_gaussian  # 假设这里是您的 get_samples 方法的导入
+from compare_methods import get_samples as get_samples_distance  # 假设这里是您的 get_samples 方法的导入
+from util import read_mymat, build_ad_dataset, process_data, build_ad_dataset
 
-# 导入原来的方法和新的方法
-from select_k_neighbors import get_samples as get_samples_gaussian
-from compare_methods import get_samples as get_samples_distance
+# 假设完整的数据集为 complete_data，形状为 (view_num, dataset_num, dim)
+# 假设使用 get_sn 方法生成缺失索引矩阵 sn，形状为 (dataset_num, view_num)
+# 假设 train_index 和 test_index 是训练集和测试集的索引
+def compare_methods(X, Y, Sn, train_index, test_index,method):
+    # # 查看索引类型与形状
+    # print('train_index:',type(train_index),train_index.shape)
+    # print('test_index:',type(test_index),test_index.shape)
+    # print('train_index dtype:', train_index.dtype)
+    # print('test_index dtype:', test_index.dtype)
 
-def get_samples(x, y, sn, train_index, test_index, n_sample, k, if_mean=False, reg_param=1e-6):
-    # 如果不需要进行处理，直接返回原始数据
-    x_train = [x[v][train_index] for v in range(len(x))]
-    y_train = y[train_index]
-    x_test = [x[v][test_index] for v in range(len(x))]
-    y_test = y[test_index]
+    if method == 'gaussian':
+        print("基于高斯分布的填充方法：")
+        get_samples = get_samples_gaussian
+    else:
+        print("基于距离的填充方法：")
+        get_samples = get_samples_distance
+    # 计算填充效果
+    X_train, Y_train, X_test, Y_test, Sn_train=get_samples(X, Y, Sn, partition['train'], partition['test'], 1, 10)
 
-    x_train = process_data(x_train, len(x))
-    x_test = process_data(x_test, len(x))
+    # 计算与原始数据集的差距
+    # 获取训练集的数据
+    X_train_origin = [x[train_index, :] for x in X]
+    # 获取测试集的数据
+    X_test_origin = [x[test_index, :] for x in X]
+    # # 查看训练集的数据形状
+    # print('X_train_origin:',[x.shape for x in X_train_origin])
+    # # 查看填充得到的训练集的数据形状
+    # print('X_train:',[x.shape for x in X_train])
 
-    return x_train, y_train, x_test, y_test, sn[train_index]
+    # 训练集：
+    # 计算每个视图的填充效果,通过均方误差表示
+    filling_diff_per_view = [np.mean(np.square(x_origin - x_train)) for x_origin, x_train in zip(X_train_origin, X_train)]
+    # 打印每个视图的填充效果
+    for i, diff in enumerate(filling_diff_per_view):
+        print(f'Training Filling difference for view {i}: {diff}')
+    
+    # 测试集：
+    # 计算每个视图的填充效果,通过均方误差表示
+    filling_diff_per_view = [np.mean(np.square(x_origin - x_test)) for x_origin, x_test in zip(X_test_origin, X_test)]
+    # 打印每个视图的填充效果
+    for i, diff in enumerate(filling_diff_per_view):
+        print(f'Test Filling difference for view {i}: {diff}')
 
-import os
-
-def compare_fill_methods(dataset_name, view_num, missing_rate):
-    data_dir = "D:/毕设/DWC-UIMC/DWC-UIMC/data/"
-    X, Y, Sn = read_mymat(data_dir, dataset_name, ['X', 'Y'], missing_rate)
-    partition = build_ad_dataset(Y, p=0.8, seed=999)
-
-    X = process_data(X, view_num)
-    X_train, Y_train, X_test, Y_test, Sn_train = get_samples(X, Y, Sn, partition['train'], partition['test'], 5, 10)
-
-    # 使用多次从多元高斯分布采样的方法填充不完整视图
-    X_train_gaussian, _, X_test_gaussian, _, _ = get_samples_gaussian(X, Y, Sn, partition['train'], partition['test'], 5, 10, if_mean=False)
-
-    # 使用基于欧氏距离加权平均的方法填充不完整视图
-    X_train_euclidean, _, X_test_euclidean, _, _ = get_samples_distance(X, Y, Sn, partition['train'], partition['test'], 5, 10, if_mean=True)
-
-    # 可视化比较填充效果
-    fig, axes = plt.subplots(2, 3, figsize=(15, 10))
-    for i in range(view_num):
-        axes[0, i].imshow(X_train[i][0].reshape(28, 28), cmap='gray')
-        axes[0, i].set_title(f'View {i+1} Original')
-        axes[0, i].axis('off')
-
-        axes[1, i].imshow(X_train_gaussian[i][0].reshape(28, 28), cmap='gray')
-        axes[1, i].set_title(f'View {i+1} Gaussian Sampling')
-        axes[1, i].axis('off')
-
-        axes[2, i].imshow(X_train_euclidean[i][0].reshape(28, 28), cmap='gray')
-        axes[2, i].set_title(f'View {i+1} Euclidean Weighted Average')
-        axes[2, i].axis('off')
-
-    plt.tight_layout()
-    plt.show()
 
 if __name__ == '__main__':
     dataset_name = 'handwritten0.mat'
     view_num = 6
-    missing_rate = 0.5
-    compare_fill_methods(dataset_name, view_num, missing_rate)
+    missing_rate = 0.3
+    X, Y, Sn = read_mymat('./data/', dataset_name, ['X', 'Y'], missing_rate)
+    partition = build_ad_dataset(Y, p=0.8, seed=999)
+
+    X = process_data(X, view_num)
+    # 测试 compare_methods 方法
+    compare_methods(X, Y, Sn, partition['train'], partition['test'],'gaussian')
+    compare_methods(X, Y, Sn, partition['train'], partition['test'],'distance')

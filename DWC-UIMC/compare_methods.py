@@ -49,7 +49,7 @@ def get_samples(x, y, sn, train_index, test_index, n_sample, k, if_mean=False, r
         # np.nonzero(sn_train[i] == 0)返回sn_train[i]中为0的索引
         # nonzero的作用是返回数组a中非零元素的索引值数组
         for v in miss_view_index:
-            # 计算样本与其他样本的距离
+            # 获取样本与其他样本的距离
             dist_v = dist_all_set[v][i]
             # 根据距离计算权重
             weights = np.exp(-dist_v / np.max(dist_v)) # 距离越近，权重越大

@@ -21,7 +21,7 @@ def get_samples(x, y, sn, train_index, test_index, n_sample, k, if_mean=False, r
     # reg_param: 正则化参数
 
     view_num = len(x) # 视图数量
-    data_num = x[0].shape[0]  # 第一个视图的样本数
+    data_num = x[0].shape[0]  # 第一个视图的样本数，即样本数
 
     # 计算每个视图中所有样本之间的欧氏距离
     print("计算距离")
@@ -146,12 +146,19 @@ def get_samples(x, y, sn, train_index, test_index, n_sample, k, if_mean=False, r
     x_test = process_data(x_test, view_num)
 
     return x_train, y_train, x_test, y_test, Sn_train
+    '''
+    x_train: 训练集样本数据，形状为 view_num * (train_num, dim)
+    y_train: 训练集标签，形状为 (train_num,)
+    x_test: 测试集样本数据，形状为 view_num * (test_num, dim)
+    y_test: 测试集标签，形状为 (test_num,)
+    Sn_train: 训练集中的缺失视图索引，形状为 (train_num, view_num)
+    '''
 
 
 if __name__ == '__main__':
     dataset_name = 'handwritten0.mat'
     view_num = 6
-    missing_rate = 0.5
+    missing_rate = 0.3
     X, Y, Sn = read_mymat('./data/', dataset_name, ['X', 'Y'], missing_rate)
     partition = build_ad_dataset(Y, p=0.8, seed=999)
 

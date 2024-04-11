@@ -1,3 +1,4 @@
+基于距离随机采样：
 	method:gaussian	missing_rate:0	accuracy:0.9425
 	method:distance	missing_rate:0	accuracy:0.95
 	method:gaussian	missing_rate:0.01	accuracy:0.96
@@ -11,3 +12,10 @@
 	method:distance	missing_rate:0.1	accuracy:0.715
 	method:distance	missing_rate:0.01	accuracy:0.9225
 	method:distance	missing_rate:0.2	accuracy:0.65
+	method:distance	missing_rate:0.2	accuracy:0.6075
+	method:distance	missing_rate:0.2	accuracy:0.22448979591836735
+	method:distance	missing_rate:0.1	accuracy:0.2403846153846154
+	method:distance	missing_rate:0.01	accuracy:0.5608465608465608
+	method:distance	missing_rate:0.01	accuracy:0.6301369863013698
+	method:gaussian	missing_rate:0.3	accuracy:0.9775
+	method:distance	missing_rate:0.3	accuracy:0.705

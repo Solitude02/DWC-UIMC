@@ -2,6 +2,7 @@ import torch
 import numpy as np
 
 class EarlyStopping:
+    """如果一段耐心限度后的验证损失无法改善，提前停止训练"""
     """Early stops the training if validation loss doesn't improve after a given patience."""
     def __init__(self, patience=7, verbose=False, delta=0):
         """
