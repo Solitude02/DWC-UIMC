@@ -88,6 +88,7 @@ def load_Sn(str_name):
     return np.loadtxt(str_name + '.csv', delimiter=',')
 
 if __name__ == '__main__':
-    sn = get_sn(6,2000,0.3)
-    save_Sn(sn,'./sh.csv')
+    missrate = 0.5
+    sn = get_sn(6,2000,missrate)
+    save_Sn(sn,'./sh_'+ str(missrate)[2:]+'.csv')
 

@@ -70,11 +70,11 @@ def get_samples(x, y, sn, train_index, test_index, n_sample, k, if_mean=False, r
     sn_test = sn[test_index]
     x_test_dissmiss_index = np.where(np.sum(sn_test, axis=1) == view_num)[0]
     if if_mean:
-        # 使用多个采样点的均值填充缺失视图
+        # 只包含完整视图的样本
         x_test = [x[_][test_index][x_test_dissmiss_index] for _ in range(view_num)]
         y_test = y[test_index][x_test_dissmiss_index]
     else:
-        # 使用所有采样点填充缺失视图
+        # 重复n_sample次包含完整视图的样本
         x_test = [np.repeat(x[_][test_index][x_test_dissmiss_index], n_sample, axis=0) for _ in range(view_num)]
         y_test = np.repeat(y[test_index][x_test_dissmiss_index], n_sample, axis=0)
 
@@ -92,7 +92,7 @@ def get_samples(x, y, sn, train_index, test_index, n_sample, k, if_mean=False, r
 
         sn_temp = sn[i] # sn[i]：(view_num,)，记录第i个样本的视图数量
         x_miss_view_index = np.nonzero(sn_temp == 0)[0] # 缺失视图索引，形状为(缺失视图数,)
-        x_dismiss_view_index = np.nonzero(sn_temp)[0] # 存在视图索引，形状为(存在视图数,)
+        x_dismiss_view_index = np.nonzero(sn_temp)[0] # 完整视图索引，形状为(完整视图数,)
 
         # 填充不完整样本
         if x_miss_view_index.shape[0] != 0: # 如果存在缺失视图（缺失视图索引的行数不为0）
@@ -110,23 +110,16 @@ def get_samples(x, y, sn, train_index, test_index, n_sample, k, if_mean=False, r
                         np.concatenate((neighbors_index_temp, nearest_index_temp), ))  # 连接所有存在的视图
 
                 # 从近邻集中基于距离随机采样填充缺失视图
-                for v in x_miss_view_index.flat:
-                    rng = np.random.default_rng() # 随机数生成器
-                    x_i[v] = x[v][neighbors_index_temp]
-                    y_i = y[neighbors_index_temp]
-                    # 计算概率
-                    dist_temp_nonzero = dist_temp[neighbors_index_temp].copy()
-                    dist_temp_nonzero[dist_temp_nonzero == 0] = 1e-10  # 将0值替换为一个非常小的值
-                    probabilities = 1/dist_temp_nonzero
-                    # 归一化概率
-                    probabilities /= probabilities.sum()
-                    selected_indices = rng.choice(x_i[v].shape[0], size=n_sample, replace=True, p=probabilities)
-                    x_i[v] = x_i[v][selected_indices] # 随机选取n_sample个样本
-
-                # # 从近邻集中随机采样填充缺失视图
-                # for _ in range(n_sample):
-                #     sampled_index = np.random.choice(neighbors_index_temp) # 从邻居索引中随机选择一个样本
-                #     x_i[j][_] = x[j][sampled_index] # 使用选中的样本的视图数据填充缺失视图
+                x_neighbors_temp = x[j][neighbors_index_temp] # 补全第j个视图的邻居集
+                rng = np.random.default_rng() # 随机数生成器
+                # 计算概率
+                dist_temp_nonzero = dist_temp[neighbors_index_temp].copy()
+                dist_temp_nonzero[dist_temp_nonzero == 0] = 1e-10  # 将0值替换为一个非常小的值
+                probabilities = 1/dist_temp_nonzero
+                # 归一化概率
+                probabilities /= probabilities.sum()
+                x_samples_temp = rng.choice(x_neighbors_temp, size=n_sample, replace=True, p=probabilities)
+                x_i[j] = x_samples_temp # 随机选取n_sample个样本
 
             x_test = [np.concatenate((x_test[_], x_i[_]), axis=0) for _ in range(view_num)] # 连接所有视图
             y_test = np.concatenate((y_test, y_i), axis=0) # 连接所有标签
@@ -143,5 +136,6 @@ if __name__ == '__main__':
     partition = build_ad_dataset(Y, p=0.8, seed=999)
 
     X = process_data(X, view_num)
+    print(partition['train'].shape, partition['test'].shape)
     X_train, Y_train, X_test, Y_test, Sn_train=get_samples(X, Y, Sn, partition['train'], partition['test'], 5, 10)
-
+    print(X_train[0].shape, Y_train.shape, X_test[0].shape, Y_test.shape, Sn_train.shape)

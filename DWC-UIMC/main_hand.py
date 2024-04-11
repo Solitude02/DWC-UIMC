@@ -93,13 +93,13 @@ if __name__ == "__main__":
     args.encoder_dims = [[240], [76], [216], [47], [64], [6]]
     args.classifier_dims = [[240], [76], [216], [47], [64], [6]]
     # # 视图数为6
-    # view_num=6
-    view_num = 3
+    view_num=6
+    # view_num = 3
 
-    # # 使用'handwritten0.mat'数据集
-    # dataset_name = 'handwritten0.mat'
-    # 使用'BRAC'数据集
-    dataset_name = 'BRAC.mat'
+    # 使用'handwritten0.mat'数据集
+    dataset_name = 'handwritten0.mat'
+    # # 使用'BRAC'数据集
+    # dataset_name = 'BRAC.mat'
     missing_rate = args.missing_rate
     # 读取数据
     X, Y, Sn = read_mymat('./data/', dataset_name, ['X', 'Y'], missing_rate)

@@ -63,12 +63,17 @@ def get_samples(x, y, sn, train_index, test_index, n_sample, k, if_mean=False, r
     x_complete = [x_train[_][x_train_dissmiss_index] for _ in range(view_num)]
     y_complete = y_train[x_train_dissmiss_index]
     sn_complete = sn_train[x_train_dissmiss_index]
+    # print(f"完整样本数量：{len(y_complete)}")
+
 
     # step4: 填充不完整视图
     x_train_miss_index = np.where(np.sum(sn_train, axis=1) < view_num)[0] # 找到训练集中缺失的视图
     x_incomplete = [np.repeat(x_train[_][x_train_miss_index], n_sample, axis=0) for _ in range(view_num)]
     y_incomplete = np.repeat(y_train[x_train_miss_index], n_sample, axis=0)
     sn_incomplete = np.repeat(sn_train[x_train_miss_index], n_sample, axis=0)
+    # print(f"不完整样本数量（填充前）：{len(y_train[x_train_miss_index])}")
+    # print(f"不完整样本数量（填充后）：{len(y_incomplete)}")
+
     index = 0
     for i in x_train_miss_index: # 遍历缺失视图的索引
         y_i = y_train[i][0] # 获取标签
@@ -88,17 +93,30 @@ def get_samples(x, y, sn, train_index, test_index, n_sample, k, if_mean=False, r
     x_train = process_data(x_train, view_num)
     y_train = np.concatenate((y_complete, y_incomplete), axis=0)
     Sn_train = np.concatenate((sn_complete, sn_incomplete), axis=0)
+    # print(f"最终训练集样本数量：{len(y_train)}")
 
     print("基于多元高斯分布填充测试集中的缺失视图")
     # 填充测试集时，只考虑训练集中存在的视图
     sn_test = sn[test_index]
     x_test_dissmiss_index = np.where(np.sum(sn_test, axis=1) == view_num)[0]
+    # x_test_incomplete_index = np.where(np.sum(sn_test, axis=1) < view_num)[0]
+    # print(f"完整样本数量：{len(x_test_dissmiss_index)}")
+    # print(f"不完整样本数量（填充前）：{len(x_test_incomplete_index)}")
+
+    '''在训练集中，我们通常不对完整的样本进行重复，因为这可能会导致过拟合。
+    过拟合是指模型在训练数据上表现得过于优秀，以至于无法很好地泛化到新的、未见过的数据上。
+    如果我们对训练集中的样本进行重复，那么模型可能会过度学习这些重复的样本，从而无法很好地处理新的数据。
+
+    然而，在测试集中，我们可能需要对完整的样本进行重复，以便更好地评估模型的性能。
+    这是因为，测试集的目的是模拟真实世界的数据分布，而在真实世界中，某些样本可能会出现多次。
+    通过在测试集中重复这些样本，我们可以更准确地评估模型在处理这些常见样本时的性能。
+    '''
     if if_mean:
-        # 使用多个采样点的均值填充缺失视图
+        # 只包含完整视图的样本
         x_test = [x[_][test_index][x_test_dissmiss_index] for _ in range(view_num)]
         y_test = y[test_index][x_test_dissmiss_index]
     else:
-        # 使用所有采样点填充缺失视图
+        # 重复n_sample次包含完整视图的样本
         x_test = [np.repeat(x[_][test_index][x_test_dissmiss_index], n_sample, axis=0) for _ in range(view_num)]
         y_test = np.repeat(y[test_index][x_test_dissmiss_index], n_sample, axis=0)
 
@@ -116,7 +134,7 @@ def get_samples(x, y, sn, train_index, test_index, n_sample, k, if_mean=False, r
 
         sn_temp = sn[i] # sn[i]：(view_num,)，记录第i个样本的视图数量
         x_miss_view_index = np.nonzero(sn_temp == 0)[0] # 缺失视图索引，形状为(缺失视图数,)
-        x_dismiss_view_index = np.nonzero(sn_temp)[0] # 存在视图索引，形状为(存在视图数,)
+        x_dismiss_view_index = np.nonzero(sn_temp)[0] # 完整视图索引，形状为(完整视图数,)
 
         # 填充不完整样本
         if x_miss_view_index.shape[0] != 0: # 如果存在缺失视图（缺失视图索引的行数不为0）
@@ -143,6 +161,9 @@ def get_samples(x, y, sn, train_index, test_index, n_sample, k, if_mean=False, r
 
             x_test = [np.concatenate((x_test[_], x_i[_]), axis=0) for _ in range(view_num)] # 连接所有视图
             y_test = np.concatenate((y_test, y_i), axis=0) # 连接所有标签
+    # print(f"不完整样本数量（填充后）：{len(y_test) - len(x_test_dissmiss_index)}")
+    # print(f"最终测试集样本数量：{len(y_test)}")
+
     x_test = process_data(x_test, view_num)
 
     return x_train, y_train, x_test, y_test, Sn_train
@@ -163,5 +184,7 @@ if __name__ == '__main__':
     partition = build_ad_dataset(Y, p=0.8, seed=999)
 
     X = process_data(X, view_num)
+    print(partition['train'].shape, partition['test'].shape)
     X_train, Y_train, X_test, Y_test, Sn_train=get_samples(X, Y, Sn, partition['train'], partition['test'], 5, 10)
+    print(X_train[0].shape, Y_train.shape, X_test[0].shape, Y_test.shape, Sn_train.shape)
 

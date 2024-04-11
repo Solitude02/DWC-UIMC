@@ -74,8 +74,11 @@ def read_mymat(path, name, sp, missrate, sparse=False):
     n_sample = len(X[0][0]) #样本数，对于handwritten0.mat数据集，n_sample=2000
     n_view = len(X) # 视图数=特征集数
     # Sn = get_sn(n_view, n_sample, missrate).astype(np.float32) # 生成缺失索引矩阵
+
     # 改成从文件中读取缺失索引矩阵
-    Sn = load_Sn("sh").astype(np.float32)
+    # 读取对应缺失率的缺失索引矩阵
+    sn_name = "sh_" + str(missrate)[2:]
+    Sn = load_Sn(sn_name).astype(np.float32)
 
     for i in range(n_view):
         X[i] = X[i].T
