@@ -88,7 +88,8 @@ def load_Sn(str_name):
     return np.loadtxt(str_name + '.csv', delimiter=',')
 
 if __name__ == '__main__':
-    missrate = 0.5
-    sn = get_sn(6,2000,missrate)
-    save_Sn(sn,'./sh_'+ str(missrate)[2:]+'.csv')
+    missrate = 0.1
+    # sn = get_sn(6,2000,missrate) # handwrite0.mat
+    sn = get_sn(3,875,missrate) # BRAC.mat
+    save_Sn(sn,'./BRAC_sh_'+ str(missrate)[2:]+'.csv')
 

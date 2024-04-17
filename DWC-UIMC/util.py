@@ -77,7 +77,8 @@ def read_mymat(path, name, sp, missrate, sparse=False):
 
     # 改成从文件中读取缺失索引矩阵
     # 读取对应缺失率的缺失索引矩阵
-    sn_name = "sh_" + str(missrate)[2:]
+    # sn_name = "sh_" + str(missrate)[2:]
+    sn_name = "BRAC_sh_" + str(missrate)[2:]
     Sn = load_Sn(sn_name).astype(np.float32)
 
     for i in range(n_view):

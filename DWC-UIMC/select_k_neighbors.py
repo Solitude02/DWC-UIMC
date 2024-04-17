@@ -25,11 +25,12 @@ def get_samples(x, y, sn, train_index, test_index, n_sample, k, if_mean=False, r
 
     # 计算每个视图中所有样本之间的欧氏距离
     print("计算距离")
+    # cdist这个函数会忽略任何缺失的数据，并且将它们视为零。这可能会导致距离计算的结果不准确。
     dist_all_set = [cdist(x[i], x[i], 'euclidean') for i in range(view_num)]
     # 构造一个 view_num*view_num 的列表，每个元素是一个数组，表示第i和j视图中都存在的所有样本的索引
     dismiss_view_index = [[np.array([]) for __ in range(view_num)] for _ in range(view_num)]
+    
     # 计算每个视图中都存在的样本索引
-
     for i in range(view_num - 1):
         for j in range(i + 1, view_num):
             # i和j视图中都存在的样本索引，即完整样本
@@ -37,7 +38,25 @@ def get_samples(x, y, sn, train_index, test_index, n_sample, k, if_mean=False, r
             sn_temp_sum = np.sum(sn_temp, axis=1) # 求和，得到每个样本的缺失视图数量
             sn_temp_sum[test_index] = 0  # 掩盖测试集样本，即”测试集样本不参与计算“
             dismiss_view_index[i][j] = dismiss_view_index[j][i] = np.where(sn_temp_sum == 2)[0]
-            # sn_temp_sum == 2 表示两个视图都缺失
+            # sn_temp_sum == 2 表示两个视图都存在
+            '''
+            sn = np.array([
+                [1, 1, 1],
+                [1, 0, 1],
+                [1, 1, 1],
+                [0, 1, 1]
+            ])  # 形状为 (4, 3)
+            test_index = np.array([2])  #2是测试集索引
+            对于视图0和视图1，都存在的样本索引为[0, 2]
+            sn_temp = np.array([
+                [1, 1],
+                [1, 0],
+                [1, 1],
+                [0, 1]
+            ])  # 形状为 (4, 2)
+            sn_temp_sum = np.array([2, 1, 0, 1])  # 形状为 (4,)
+            dismiss_view_index[0][1] = dismiss_view_index[1][0] = np.array([0])  # 形状为 (1,)
+            '''
 
     print("使用多元高斯分布填充训练集中的缺失视图")
     # step1: 获取训练集
@@ -75,7 +94,7 @@ def get_samples(x, y, sn, train_index, test_index, n_sample, k, if_mean=False, r
     # print(f"不完整样本数量（填充后）：{len(y_incomplete)}")
 
     index = 0
-    for i in x_train_miss_index: # 遍历缺失视图的索引
+    for i in x_train_miss_index: # 遍历拥有缺失视图的样本
         y_i = y_train[i][0] # 获取标签
         miss_view_index = np.nonzero(sn_train[i] == 0)[0] # 获取缺失视图的索引
         # np.nonzero(sn_train[i] == 0)返回sn_train[i]中为0的索引
@@ -96,7 +115,6 @@ def get_samples(x, y, sn, train_index, test_index, n_sample, k, if_mean=False, r
     # print(f"最终训练集样本数量：{len(y_train)}")
 
     print("基于多元高斯分布填充测试集中的缺失视图")
-    # 填充测试集时，只考虑训练集中存在的视图
     sn_test = sn[test_index]
     x_test_dissmiss_index = np.where(np.sum(sn_test, axis=1) == view_num)[0]
     # x_test_incomplete_index = np.where(np.sum(sn_test, axis=1) < view_num)[0]
@@ -132,16 +150,17 @@ def get_samples(x, y, sn, train_index, test_index, n_sample, k, if_mean=False, r
             # (n_sample, 1,)
             y_i = np.repeat(np.expand_dims(y[i], axis=0), n_sample, axis=0)
 
-        sn_temp = sn[i] # sn[i]：(view_num,)，记录第i个样本的视图数量
-        x_miss_view_index = np.nonzero(sn_temp == 0)[0] # 缺失视图索引，形状为(缺失视图数,)
-        x_dismiss_view_index = np.nonzero(sn_temp)[0] # 完整视图索引，形状为(完整视图数,)
+        sn_temp = sn[i] # sn[i]：(view_num,)，记录第i个样本的视图数量，sn_temp == 0则该视图缺失
+        x_miss_view_index = np.nonzero(sn_temp == 0)[0] # 缺失视图索引，[缺失视图1，缺失视图2，...]
+        x_dismiss_view_index = np.nonzero(sn_temp)[0] # 完整视图索引，[完整视图1，完整视图2，...]
 
         # 填充不完整样本
         if x_miss_view_index.shape[0] != 0: # 如果存在缺失视图（缺失视图索引的行数不为0）
-            for j in x_miss_view_index.flat: # 遍历拥有缺失视图的样本
+            for j in x_miss_view_index.flat: # 遍历缺失视图
                 # 获取x在第j个视图上的邻居索引
                 neighbors_index_temp = np.array([], dtype=np.int_)
-                for jj in x_dismiss_view_index.flat: #遍历拥有两个以上视图的样本，只要同时拥有j和另外一个视图即可
+                for jj in x_dismiss_view_index.flat: 
+                    #遍历拥有两个以上视图的样本，只要同时拥有j和另外一个视图即可
                     dismiss_view_index_temp = dismiss_view_index[j][jj]  # 第j和jj个视图都存在的样本索引
                     dist_temp = np.full(data_num, np.inf) # 初始化距离
                     dist_temp[dismiss_view_index_temp] = dist_all_set[jj][i, dismiss_view_index_temp] # 计算距离
@@ -177,8 +196,10 @@ def get_samples(x, y, sn, train_index, test_index, n_sample, k, if_mean=False, r
 
 
 if __name__ == '__main__':
-    dataset_name = 'handwritten0.mat'
-    view_num = 6
+    # dataset_name = 'handwritten0.mat'
+    # view_num = 6
+    dataset_name = 'BRAC.mat'
+    view_num = 3
     missing_rate = 0.3
     X, Y, Sn = read_mymat('./data/', dataset_name, ['X', 'Y'], missing_rate)
     partition = build_ad_dataset(Y, p=0.8, seed=999)

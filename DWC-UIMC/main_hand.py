@@ -72,10 +72,10 @@ if __name__ == "__main__":
                         help='times of sampling [default: 10]')
     # 邻居数，默认10
     parser.add_argument('--k', type=int, default=10, metavar='LR',
-                        help='number of neighbors [default: 0]')
+                        help='number of neighbors [default: 10]')
     # 测试邻居数，默认10
     parser.add_argument('--k_test', type=int, default=10, metavar='LR',
-                        help='number of neighbors [default: 0]')
+                        help='number of neighbors [default: 10]')
     # 是否使用均值，默认False
     parser.add_argument('--if-mean', type=int, default=0, metavar='LR',
                         help='if mean [default: True]')
@@ -89,17 +89,23 @@ if __name__ == "__main__":
     args.cuda = False  # Disable CUDA
 
     # 设置编码器、解码器和分类器的维度
-    args.decoder_dims = [[240], [76], [216], [47], [64], [6]]
-    args.encoder_dims = [[240], [76], [216], [47], [64], [6]]
-    args.classifier_dims = [[240], [76], [216], [47], [64], [6]]
-    # # 视图数为6
-    view_num=6
-    # view_num = 3
+    # args.decoder_dims = [[240], [76], [216], [47], [64], [6]]
+    # args.encoder_dims = [[240], [76], [216], [47], [64], [6]]
+    # args.classifier_dims = [[240], [76], [216], [47], [64], [6]]
 
-    # 使用'handwritten0.mat'数据集
-    dataset_name = 'handwritten0.mat'
-    # # 使用'BRAC'数据集
-    # dataset_name = 'BRAC.mat'
+    args.decoder_dims = [[1000], [1000], [503]]
+    args.encoder_dims = [[1000], [1000], [503]]
+    args.classifier_dims = [[1000], [1000], [503]]
+
+    # # 视图数为6
+    # view_num=6
+
+    view_num = 3
+
+    # # 使用'handwritten0.mat'数据集
+    # dataset_name = 'handwritten0.mat'
+    # 使用'BRAC'数据集
+    dataset_name = 'BRAC.mat'
     missing_rate = args.missing_rate
     # 读取数据
     X, Y, Sn = read_mymat('./data/', dataset_name, ['X', 'Y'], missing_rate)
@@ -180,7 +186,7 @@ if __name__ == "__main__":
                 sn = Variable(sn.long().cpu())
             # refresh the optimizer
             optimizer.zero_grad()
-            evidences, evidence_a, loss = model(data, target, epoch, batch_idx, sn)
+            evidences, evidence_a, loss = model(data, target, epoch, batch_idx, sn) # 调用model的forward方法
             # compute gradients and take step
             loss.backward()
             optimizer.step()
@@ -225,9 +231,9 @@ if __name__ == "__main__":
         if early_stopping.early_stop:
             print("Early stopping")
             break
-    model = nn.DataParallel(model)
-    model.load_state_dict(torch.load('checkpoint_hand.pt'), False)
-    acc = test(epoch, test_loader)
+    model = nn.DataParallel(model) # 多GPU并行计算
+    model.load_state_dict(torch.load('checkpoint_brac.pt'), False) # 加载相同预训练模型
+    acc = test(epoch, test_loader) # 测试模型
 
 
 
