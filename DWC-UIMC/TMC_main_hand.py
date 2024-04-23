@@ -1,4 +1,4 @@
-import os
+Variableimport os
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -10,9 +10,7 @@ from util import mv_dataset, read_mymat, build_ad_dataset, process_data, get_val
 import warnings
 from EarlyStopping_hand import EarlyStopping
 from collections import Counter
-# 导入原来的方法和新的方法
-from select_k_neighbors import get_samples as get_samples_gaussian
-from compare_methods import get_samples as get_samples_distance
+from icecream import ic
 
 warnings.filterwarnings("ignore")
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
@@ -65,10 +63,10 @@ if __name__ == "__main__":
     parser.add_argument('--cuda', action='store_true', default=False,
                         help='enables CUDA training [default: False]')
     # 缺失率，默认0
-    parser.add_argument('--missing-rate', type=float, default=0.1, metavar='LR',
+    parser.add_argument('--missing-rate', type=float, default=0, metavar='LR',
                         help='missingrate [default: 0]')
     # 采样次数，默认30
-    parser.add_argument('--n-sample', type=int, default=30, metavar='LR',
+    parser.add_argument('--n-sample', type=int, default=1, metavar='LR',
                         help='times of sampling [default: 10]')
     # 邻居数，默认10
     parser.add_argument('--k', type=int, default=10, metavar='LR',
@@ -82,17 +80,15 @@ if __name__ == "__main__":
     # 潜在维度，默认64
     parser.add_argument('--latent-dim', type=int, default=64, metavar='LR',
                         help='latent layer dimension [default: True]')
-    # 填充方法，默认基于高斯分布即UIMC原方法
-    parser.add_argument('--method', type=str, default='gaussian', choices=['gaussian', 'distance'],
-                    help='method to use for getting samples [default: gaussian]')
+
     args = parser.parse_args()
     args.cuda = False  # Disable CUDA
 
-    # 设置编码器、解码器和分类器的维度
+    # 设置编码器、解码器和分类器的维度(handwritten0.mat数据集)
     # args.decoder_dims = [[240], [76], [216], [47], [64], [6]]
     # args.encoder_dims = [[240], [76], [216], [47], [64], [6]]
     # args.classifier_dims = [[240], [76], [216], [47], [64], [6]]
-
+    # BRCA.mat数据集
     args.decoder_dims = [[1000], [1000], [503]]
     args.encoder_dims = [[1000], [1000], [503]]
     args.classifier_dims = [[1000], [1000], [503]]
@@ -113,17 +109,14 @@ if __name__ == "__main__":
 
     X = process_data(X, view_num)
 
-    # 根据选择的方法来获取样本
-    if args.method == 'gaussian':
-        get_samples = get_samples_gaussian
-    else:
-        get_samples = get_samples_distance
-
-    X_train, Y_train, X_test, Y_test, Sn_train = get_samples(x=X, y=Y, sn=Sn,
-                                                   train_index=partition['train'],
-                                                   test_index=partition['test'],
-                                                   n_sample=args.n_sample,
-                                                   k=args.k)
+    train_index= partition['train']
+    test_index= partition['test'],
+    X_train= [X[v][train_index] for v in range(view_num)]
+    Y_train= Y[train_index]
+    Sn_train= Sn[train_index]
+    # 将测试集的样本重复5次，控制变量
+    X_test= np.repeat([X[v][test_index] for v in range(view_num)], 5, axis=1)
+    Y_test= np.repeat(Y[test_index], 5, axis=0)
 
     train_loader = DataLoader(dataset=partial_mv_dataset(X_train, Sn_train, Y_train), batch_size=args.batch_size,
                               shuffle=True, num_workers=1,
@@ -218,7 +211,7 @@ if __name__ == "__main__":
                 most_ = Counter(list_).most_common(1)[0][0]
                 if most_ == target[0]:
                     correct_num += 1
-        data_num = int(data_num/args.n_sample)
+        data_num = int(data_num)
         acc = correct_num / data_num
         print("total_num：",data_num)
         print('====> accuracy：', acc)
@@ -237,8 +230,7 @@ if __name__ == "__main__":
 
 
 
-    # with open("./test-hand.txt", "a") as f:
-    with open("./test-brac.txt", "a") as f:     
-        text = "\tmethod:" + args.method + "\tmissing_rate:" + str(missing_rate) + "\taccuracy:" + str(acc) +"\n"
+    with open("./test-brac.txt", "a") as f:
+        text = "\tmethod:" + "TMC" + "\taccuracy:" + str(acc) +"\n"
         f.write(text)
     f.close()

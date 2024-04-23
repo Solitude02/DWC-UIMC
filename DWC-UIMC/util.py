@@ -36,7 +36,7 @@ def read_mymat(path, name, sp, missrate, sparse=False):
 
     if 'Y' in sp:
         # 读取gt字段作为Y
-        if (name == 'handwritten0.mat') or (name == 'BRAC.mat') or (name == 'ROSMAP.mat'):
+        if (name == 'handwritten0.mat') or (name == 'BRCA.mat') or (name == 'ROSMAP.mat'):
             Y = (f['gt']).astype(np.int32)
         else:
             Y = (f['gt']-1).astype(np.int32)
@@ -77,9 +77,16 @@ def read_mymat(path, name, sp, missrate, sparse=False):
 
     # 改成从文件中读取缺失索引矩阵
     # 读取对应缺失率的缺失索引矩阵
-    # sn_name = "sh_" + str(missrate)[2:]
-    sn_name = "BRAC_sh_" + str(missrate)[2:]
-    Sn = load_Sn(sn_name).astype(np.float32)
+    if name == 'handwritten0.mat':
+        sn_name = "sh_" + str(missrate)[2:]
+    elif name == 'BRCA.mat':
+        sn_name = "BRCA_sh_" + str(missrate)[2:]
+    
+    # 读取缺失索引矩阵，缺失率为0时，Sn为全1矩阵
+    if missrate == 0:
+        Sn = np.ones((n_sample, n_view))
+    else:
+        Sn = load_Sn(sn_name).astype(np.float32)
 
     for i in range(n_view):
         X[i] = X[i].T
@@ -155,6 +162,7 @@ def process_data(X, n_view):
 
 
 class partial_mv_dataset(Dataset):
+    # 用于处理部分多视图数据集
     def __init__(self, data, Sn, Y):
         '''
         :param data: Input data is a list of numpy arrays
@@ -174,6 +182,7 @@ class partial_mv_dataset(Dataset):
 
 
 class mv_dataset(Dataset):
+    # 用于处理完整多视图数据集
     def __init__(self, data, Y):
         '''
         :param data: Input data is a list of numpy arrays
@@ -190,6 +199,8 @@ class mv_dataset(Dataset):
         return self.data[0].shape[0]
 
 def partial_mv_tabular_collate(batch):
+    # 用于处理部分多视图数据集
+
     new_batch = [[] for _ in range(len(batch[0][0]))]
     new_label = []
     new_Sn = []

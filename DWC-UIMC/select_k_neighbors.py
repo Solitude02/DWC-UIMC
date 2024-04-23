@@ -78,10 +78,14 @@ def get_samples(x, y, sn, train_index, test_index, n_sample, k, if_mean=False, r
         # means形式为：{第v个视图：[第c个类的均值，第c+1个类的均值，...], 第v+1个视图：[第c个类的均值，第c+1个类的均值，...], ...}
 
     # step3: 筛选完整样本
+    # x_train_dissmiss_index = np.where(np.sum(sn_train, axis=1) == view_num)[0]
+    # x_complete = [x_train[_][x_train_dissmiss_index] for _ in range(view_num)]
+    # y_complete = y_train[x_train_dissmiss_index]
+    # sn_complete = sn_train[x_train_dissmiss_index]
     x_train_dissmiss_index = np.where(np.sum(sn_train, axis=1) == view_num)[0]
-    x_complete = [x_train[_][x_train_dissmiss_index] for _ in range(view_num)]
-    y_complete = y_train[x_train_dissmiss_index]
-    sn_complete = sn_train[x_train_dissmiss_index]
+    x_complete = [np.repeat(x_train[_][x_train_dissmiss_index], n_sample, axis=0) for _ in range(view_num)]
+    y_complete = np.repeat(y_train[x_train_dissmiss_index], n_sample, axis=0)
+    sn_complete = np.repeat(sn_train[x_train_dissmiss_index], n_sample, axis=0)
     # print(f"完整样本数量：{len(y_complete)}")
 
 
@@ -198,9 +202,9 @@ def get_samples(x, y, sn, train_index, test_index, n_sample, k, if_mean=False, r
 if __name__ == '__main__':
     # dataset_name = 'handwritten0.mat'
     # view_num = 6
-    dataset_name = 'BRAC.mat'
+    dataset_name = 'BRCA.mat'
     view_num = 3
-    missing_rate = 0.3
+    missing_rate = 0
     X, Y, Sn = read_mymat('./data/', dataset_name, ['X', 'Y'], missing_rate)
     partition = build_ad_dataset(Y, p=0.8, seed=999)
 
@@ -208,4 +212,3 @@ if __name__ == '__main__':
     print(partition['train'].shape, partition['test'].shape)
     X_train, Y_train, X_test, Y_test, Sn_train=get_samples(X, Y, Sn, partition['train'], partition['test'], 5, 10)
     print(X_train[0].shape, Y_train.shape, X_test[0].shape, Y_test.shape, Sn_train.shape)
-

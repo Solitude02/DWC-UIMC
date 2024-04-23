@@ -13,6 +13,8 @@ def get_sn(view_num, alldata_len, missing_rate):
     """
     one_rate = 1-missing_rate # 完整视图数据比例
     if one_rate <= (1 / view_num): 
+        # 如果完整视图数据比例小于等于1/视图数量，意味着每个视图中的完整数据比例都不足以构成一个完整的数据集。
+        # 每个样本只有一个视图的数据是完整的，其他视图的数据是缺失的。
         '''
         假设我们有一个3视图，5样本的数据集，获得随机整数矩阵为：
         [[0],
@@ -28,8 +30,6 @@ def get_sn(view_num, alldata_len, missing_rate):
          [1, 0, 0]]
         代表第一个样本的完整视图数据是第0个视图，第二个样本的完整视图数据是第2个视图，以此类推。
         '''
-        # 如果完整视图数据比例小于等于1/视图数量，意味着每个视图中的完整数据比例都不足以构成一个完整的数据集。
-        # 每个样本只有一个视图的数据是完整的，其他视图的数据是缺失的。
         enc = OneHotEncoder() # OneHotEncoder()用于将整数标签转换为独热编码
 
         # 生成一个大小为alldata_len*1的随机整数矩阵，元素取值范围为[0,view_num)
@@ -88,8 +88,8 @@ def load_Sn(str_name):
     return np.loadtxt(str_name + '.csv', delimiter=',')
 
 if __name__ == '__main__':
-    missrate = 0.1
+    missrate = 0.3
     # sn = get_sn(6,2000,missrate) # handwrite0.mat
-    sn = get_sn(3,875,missrate) # BRAC.mat
-    save_Sn(sn,'./BRAC_sh_'+ str(missrate)[2:]+'.csv')
+    sn = get_sn(3,875,missrate) # BRCA.mat
+    save_Sn(sn,'./BRCA_sh_'+ str(missrate)[2:]+'.csv')
 
