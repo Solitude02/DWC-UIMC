@@ -88,8 +88,16 @@ def load_Sn(str_name):
     return np.loadtxt(str_name + '.csv', delimiter=',')
 
 if __name__ == '__main__':
-    missrate = 0.3
-    # sn = get_sn(6,2000,missrate) # handwrite0.mat
-    sn = get_sn(3,875,missrate) # BRCA.mat
-    save_Sn(sn,'./BRCA_sh_'+ str(missrate)[2:]+'.csv')
+    missrate = 0.2
+    dataset_name_list = ['handwritten0.mat','BRCA.mat','ROSMAP.mat']
+    dataset_name = dataset_name_list[0]
+    if dataset_name == 'handwritten0.mat':
+        sn = get_sn(6,2000,missrate) # handwrite0.mat
+        save_Sn(sn,'./handwritten_sh_'+ str(missrate)[2:]+'.csv')
+    elif dataset_name == 'BRCA.mat':
+        sn = get_sn(3,875,missrate) # BRCA.mat
+        save_Sn(sn,'./BRCA_sh_'+ str(missrate)[2:]+'.csv')
+    elif dataset_name == 'ROSMAP.mat':
+        sn = get_sn(3,107,missrate) # ROSMAP.mat
+
 

@@ -2,6 +2,8 @@ import numpy as np
 from util import mv_dataset, read_mymat, build_ad_dataset, process_data, get_validation_set, \
     mv_tabular_collate
 from scipy.spatial.distance import cdist
+from icecream import ic
+ic.disable()
 
 # 定义一个正则化参数，用于多元高斯分布的协方差矩阵的正则化，以防止过拟合。
 reg_param  = 1e-3
@@ -63,7 +65,9 @@ def get_samples(x, y, sn, train_index, test_index, n_sample, k, if_mean=False, r
     sn_train = sn[train_index] # sn_train：(train_num, view_num)，记录第train_num个样本的缺失视图
     x_train = [x[v][train_index] for v in range(view_num)] # x_train: 
     y_train = y[train_index] # y_train:
+
     # step2: 在每个视图上获取每个类的样本点
+    # 直接使用了完整数据集，不符合现实情况
     class_num = np.max(y) + 1
     means, covs, num = dict(), dict(), dict()
     for v in range(view_num):
@@ -71,6 +75,7 @@ def get_samples(x, y, sn, train_index, test_index, n_sample, k, if_mean=False, r
         means_v, covs_v, num_v = [], [], []
         for c in range(class_num):
             present_index_class = np.where(y_train[present_index] == c)[0]
+            # 这里直接使用了x_train而没有使用sn_train，不符合现实情况
             means_v.append(np.mean(x_train[v][present_index_class], axis=0))
             covs_v.append(np.cov(x_train[v][present_index_class], rowvar=0))
             num_v.append(present_index_class.shape[0])
@@ -83,6 +88,7 @@ def get_samples(x, y, sn, train_index, test_index, n_sample, k, if_mean=False, r
     # y_complete = y_train[x_train_dissmiss_index]
     # sn_complete = sn_train[x_train_dissmiss_index]
     x_train_dissmiss_index = np.where(np.sum(sn_train, axis=1) == view_num)[0]
+    ic(len(x_train_dissmiss_index))
     x_complete = [np.repeat(x_train[_][x_train_dissmiss_index], n_sample, axis=0) for _ in range(view_num)]
     y_complete = np.repeat(y_train[x_train_dissmiss_index], n_sample, axis=0)
     sn_complete = np.repeat(sn_train[x_train_dissmiss_index], n_sample, axis=0)
@@ -200,11 +206,11 @@ def get_samples(x, y, sn, train_index, test_index, n_sample, k, if_mean=False, r
 
 
 if __name__ == '__main__':
-    # dataset_name = 'handwritten0.mat'
-    # view_num = 6
-    dataset_name = 'BRCA.mat'
-    view_num = 3
-    missing_rate = 0
+    dataset_name = 'handwritten0.mat'
+    view_num = 6
+    # dataset_name = 'BRCA.mat'
+    # view_num = 3
+    missing_rate = 0.5
     X, Y, Sn = read_mymat('./data/', dataset_name, ['X', 'Y'], missing_rate)
     partition = build_ad_dataset(Y, p=0.8, seed=999)
 

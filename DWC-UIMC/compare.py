@@ -59,32 +59,50 @@ def compare_methods(X, Y, Sn, train_index, test_index,method):
     # print('X_train:',[x.shape for x in X_train])
 
     # 训练集：
-    # # 计算每个视图的填充效果,通过均方误差表示
-    # filling_diff_per_view = [np.mean(np.square(x_origin - x_train)) for x_origin, x_train in zip(X_train_origin, X_train)]
-    # # 打印每个视图的填充效果
-    # for i, diff in enumerate(filling_diff_per_view):
-    #     print(f'Training Filling difference for view {i}: {diff}')
+    # 计算每个视图的填充效果,通过均方误差表示
+    filling_diff_per_view = [np.mean(np.square(x_origin - x_train)) for x_origin, x_train in zip(X_train_origin, X_train)]
+    # 打印每个视图的填充效果
+    for i, diff in enumerate(filling_diff_per_view):
+        print(f'Training Filling difference for view {i}: {diff}')
         
     # 调用函数来可视化填充效果
-    visualize_concatenated_data(X_train, Y_train, 'Imputed Data under η = 0.5')
+    # visualize_concatenated_data(X_train, Y_train, 'Imputed Data under η = 0.5')
     
     # 测试集：
-    # # 计算每个视图的填充效果,通过均方误差表示
-    # filling_diff_per_view = [np.mean(np.square(x_origin - x_test)) for x_origin, x_test in zip(X_test_origin, X_test)]
-    # # 打印每个视图的填充效果
-    # for i, diff in enumerate(filling_diff_per_view):
-    #     print(f'Test Filling difference for view {i}: {diff}')
+    # 计算每个视图的填充效果,通过均方误差表示
+    filling_diff_per_view = [np.mean(np.square(x_origin - x_test)) for x_origin, x_test in zip(X_test_origin, X_test)]
+    # 打印每个视图的填充效果
+    for i, diff in enumerate(filling_diff_per_view):
+        print(f'Test Filling difference for view {i}: {diff}')
     
     # 调用函数来可视化填充效果
-    visualize_concatenated_data(X_test, Y_test, 'Imputed Data under η = 0.5')
+    # visualize_concatenated_data(X_test, Y_test, 'Imputed Data under η = 0.5')
+
+def compare_methods_on_complete_data(X, Y, Sn, train_index, test_index):
+    # 基于高斯分布的填充方法
+    print("基于高斯分布的填充方法：")
+    X_train_gaussian, Y_train_gaussian, X_test_gaussian, Y_test_gaussian, Sn_train_gaussian = get_samples_gaussian(X, Y, Sn, train_index, test_index, 5, 10)
+
+    # 基于距离的填充方法
+    print("基于距离的填充方法：")
+    X_train_distance, Y_train_distance, X_test_distance, Y_test_distance, Sn_train_distance = get_samples_distance(X, Y, Sn, train_index, test_index, 5, 10)
+
+    # 计算两种方法的结果是否相同
+    # 训练集
+    train_difference = [np.allclose(x_gaussian, x_distance) for x_gaussian, x_distance in zip(X_train_gaussian, X_train_distance)]
+    print('Training data difference between two methods:', train_difference)
+
+    # 测试集
+    test_difference = [np.allclose(x_gaussian, x_distance) for x_gaussian, x_distance in zip(X_test_gaussian, X_test_distance)]
+    print('Test data difference between two methods:', test_difference)
 
 
 if __name__ == '__main__':
-    # dataset_name = 'handwritten0.mat'
-    # view_num = 6
-    dataset_name = 'BRAC.mat'
-    view_num = 3
-    missing_rate = 0.5
+    dataset_name = 'handwritten0.mat'
+    view_num = 6
+    # dataset_name = 'BRCA.mat'
+    # view_num = 3
+    missing_rate = 0
     X, Y, Sn = read_mymat('./data/', dataset_name, ['X', 'Y'], missing_rate)
     partition = build_ad_dataset(Y, p=0.8, seed=999)
 

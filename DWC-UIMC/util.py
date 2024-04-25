@@ -78,9 +78,11 @@ def read_mymat(path, name, sp, missrate, sparse=False):
     # 改成从文件中读取缺失索引矩阵
     # 读取对应缺失率的缺失索引矩阵
     if name == 'handwritten0.mat':
-        sn_name = "sh_" + str(missrate)[2:]
+        sn_name = "handwritten_sh_" + str(missrate)[2:]
     elif name == 'BRCA.mat':
         sn_name = "BRCA_sh_" + str(missrate)[2:]
+    elif name == 'ROSMAP.mat':
+        sn_name = "ROSMAP_sh_" + str(missrate)[2:]
     
     # 读取缺失索引矩阵，缺失率为0时，Sn为全1矩阵
     if missrate == 0:

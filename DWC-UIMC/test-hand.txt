@@ -1,0 +1,69 @@
+	method:gaussian	missing_rate:0.0	accuracy:0.9825
+	method:gaussian	missing_rate:0.0	accuracy:0.9825
+	method:gaussian	missing_rate:0.0	accuracy:0.98
+	method:gaussian	missing_rate:0.0	accuracy:0.98
+	method:gaussian	missing_rate:0.0	accuracy:0.9825
+	method:distance	missing_rate:0.0	accuracy:0.98
+	method:distance	missing_rate:0.0	accuracy:0.985
+	method:distance	missing_rate:0.0	accuracy:0.9775
+	method:distance	missing_rate:0.0	accuracy:0.9825
+	method:distance	missing_rate:0.0	accuracy:0.9825
+(0.985+0.9825+0.9825)/3 = 0.9833
+
+	method:gaussian	missing_rate:0.1	accuracy:0.98
+	method:gaussian	missing_rate:0.1	accuracy:0.9825
+	method:gaussian	missing_rate:0.1	accuracy:0.98
+	method:gaussian	missing_rate:0.1	accuracy:0.9825
+	method:gaussian	missing_rate:0.1	accuracy:0.985
+	method:gaussian	missing_rate:0.1	accuracy:0.985
+	method:gaussian	missing_rate:0.1	accuracy:0.98
+	method:gaussian	missing_rate:0.1	accuracy:0.9875
+	method:gaussian	missing_rate:0.1	accuracy:0.98
+	method:gaussian	missing_rate:0.1	accuracy:0.9825
+(0.9875+0.985+0.985)/3 = 0.985833333
+
+	method:distance	missing_rate:0.1	accuracy:0.9775
+	method:distance	missing_rate:0.1	accuracy:0.98
+	method:distance	missing_rate:0.1	accuracy:0.9825
+	method:distance	missing_rate:0.1	accuracy:0.975
+	method:distance	missing_rate:0.1	accuracy:0.98
+	method:distance	missing_rate:0.1	accuracy:0.975
+	method:distance	missing_rate:0.1	accuracy:0.9775
+	method:distance	missing_rate:0.1	accuracy:0.98
+	method:distance	missing_rate:0.1	accuracy:0.9775
+	method:distance	missing_rate:0.1	accuracy:0.98
+(0.9825+0.98+0.98)/3 = 0.9808333
+
+	method:distance	missing_rate:0.2	accuracy:0.98
+	method:distance	missing_rate:0.3	accuracy:0.975
+	method:distance	missing_rate:0.4	accuracy:0.9775
+	method:distance	missing_rate:0.5	accuracy:0.9475
+	
+	method:gaussian	missing_rate:0.2	accuracy:0.98
+	method:gaussian	missing_rate:0.3	accuracy:0.975
+	method:gaussian	missing_rate:0.4	accuracy:0.9775
+	method:gaussian	missing_rate:0.5	accuracy:0.955
+	测试将n_sample换1：
+		method:distance	missing_rate:0.5	accuracy:0.655
+	method:distance	missing_rate:0.5	accuracy:0.6675
+	method:distance	missing_rate:0.5	accuracy:0.6775
+	method:gaussian	missing_rate:0.5	accuracy:0.8325
+	method:distance	missing_rate:0.5	accuracy:0.6875
+	method:gaussian	missing_rate:0.5	accuracy:0.8825
+	method:gaussian	missing_rate:0.5	accuracy:0.94
+	method:distance	missing_rate:0.5	accuracy:0.63
+	method:mean	missing_rate:0.5	accuracy:0.9
+	method:mean	missing_rate:0.1	accuracy:0.9
+	method:mean	missing_rate:0.1	accuracy:0.7692307692307693
+	method:mean	missing_rate:0.1	accuracy:0.94
+	method:mean	missing_rate:0.2	accuracy:0.9075
+	method:mean	missing_rate:0.3	accuracy:0.9125
+	method:mean	missing_rate:0.4	accuracy:0.865
+	method:mean	missing_rate:0.0	accuracy:0.935
+	method:gaussian	missing_rate:0.0	accuracy:0.9425
+	method:mean	missing_rate:0.0	accuracy:0.7692307692307693
+	method:mean	missing_rate:0.0	accuracy:0.925
+	method:mean	missing_rate:0.5	accuracy:0.925
+	method:mean	missing_rate:0.5	accuracy:0.8425
+	method:mean	missing_rate:0.5	accuracy:0.9125
+	method:mean	missing_rate:0.5	accuracy:0.9475

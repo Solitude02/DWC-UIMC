@@ -47,17 +47,13 @@ def get_samples(x, y, sn, train_index, test_index, n_sample, k, if_mean=False, r
     y_incomplete = np.repeat(y_train[x_train_miss_index], n_sample, axis=0)
     sn_incomplete = np.repeat(sn_train[x_train_miss_index], n_sample, axis=0)
 
-    # print("计算训练集距离")
-    # x_train_full = [np.concatenate((x_complete[_], x_incomplete[_]), axis=0) for _ in range(view_num)]
-    # dist_train_set = [cdist(x_train_full[i], x_train_full[i], 'euclidean') for i in range(view_num)]
-
     index = 0
     for i in x_train_miss_index: # 遍历缺失视图的索引
         y_i = y_train[i][0] # 获取标签
         miss_view_index = np.nonzero(sn_train[i] == 0)[0] # 获取缺失视图的索引
         for v in miss_view_index:
             # 获取同类完整样本集的索引
-            same_class_index = np.where(y_train[x_train_dissmiss_index] == y_i)[0]
+            same_class_index = np.where(y[x_train_dissmiss_index] == y_i)[0]
             same_class_complete_samples = x_complete[v][same_class_index]
             # 计算距离
             dist_v = dist_all_set[v][i, same_class_index]
@@ -68,7 +64,7 @@ def get_samples(x, y, sn, train_index, test_index, n_sample, k, if_mean=False, r
             x_samples_average_temp = np.zeros((n_sample, same_class_complete_samples.shape[1]), dtype=np.float_)
             for s in range(n_sample):
                 # 随机采样
-                chosen_indices = np.random.choice(len(same_class_complete_samples), 5, p=weights)
+                chosen_indices = np.random.choice(len(same_class_complete_samples), n_sample, p=weights)
                 chosen_samples = same_class_complete_samples[chosen_indices]
                 chosen_weights = weights[chosen_indices]
                 chosen_weights /= chosen_weights.sum()
@@ -79,7 +75,6 @@ def get_samples(x, y, sn, train_index, test_index, n_sample, k, if_mean=False, r
         index += 1
 
     x_train = [np.concatenate((x_complete[_], x_incomplete[_]), axis=0) for _ in range(view_num)]
-    ic(x_train[0].shape)
     x_train = process_data(x_train, view_num)
     y_train = np.concatenate((y_complete, y_incomplete), axis=0)
     Sn_train = np.concatenate((sn_complete, sn_incomplete), axis=0)
@@ -129,17 +124,16 @@ def get_samples(x, y, sn, train_index, test_index, n_sample, k, if_mean=False, r
         
                 # 从近邻集中基于距离随机采样填充缺失视图
                 x_neighbors_temp = x[j][neighbors_index_temp] # 补全第j个视图的邻居集
-                ic(x_neighbors_temp.shape)
                 # 计算概率
                 dist_j = dist_all_set[j][i, neighbors_index_temp] # 计算距离
                 probabilities = np.exp(-dist_j / np.max(dist_j))
                 # 归一化概率
                 probabilities /= probabilities.sum()
-                x_samples_average_temp = np.empty((n_sample, x_neighbors_temp.shape[1]), dtype=np.float_)
+                x_samples_average_temp = np.array([], dtype=np.float_)
                 for s in range(n_sample):
                     rng = np.random.default_rng() # 随机数生成器
                     # 选择样本的索引
-                    sample_indices = rng.choice(len(x_neighbors_temp), size=5, replace=False, p=probabilities)
+                    sample_indices = rng.choice(len(x_neighbors_temp), size=n_sample, replace=True, p=probabilities)
                     x_samples_temp = x_neighbors_temp[sample_indices]
                     # 在选中的样本范围内重新计算并归一化权重
                     weights_temp = probabilities[sample_indices]
@@ -149,7 +143,6 @@ def get_samples(x, y, sn, train_index, test_index, n_sample, k, if_mean=False, r
                     x_samples_average_temp[s] = fill_value
                 x_i[j] = x_samples_average_temp # 随机选取n_sample个样本
             x_test = [np.concatenate((x_test[_], x_i[_]), axis=0) for _ in range(view_num)] # 连接所有视图
-            ic(x_test[0].shape)
             y_test = np.concatenate((y_test, y_i), axis=0) # 连接所有标签
     x_test = process_data(x_test, view_num)
 
