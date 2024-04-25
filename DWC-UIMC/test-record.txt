@@ -1,180 +1,31 @@
-基于距离随机采样：
-	method:gaussian	missing_rate:0	accuracy:0.9425
-	method:distance	missing_rate:0	accuracy:0.95
-	method:gaussian	missing_rate:0.01	accuracy:0.96
-	method:distance	missing_rate:0.01	accuracy:0.905
-	method:gaussian	missing_rate:0.02	accuracy:0.97
-	method:distance	missing_rate:0.02	accuracy:0.9075
-	method:gaussian	missing_rate:0.03	accuracy:0.9675
-	method:distance	missing_rate:0.03	accuracy:0.8425
-	method:gaussian	missing_rate:0.1	accuracy:0.985
-	method:distance	missing_rate:0.1	accuracy:0.685
-	method:distance	missing_rate:0.1	accuracy:0.715
-	method:distance	missing_rate:0.01	accuracy:0.9225
-	method:distance	missing_rate:0.2	accuracy:0.65
-	method:distance	missing_rate:0.2	accuracy:0.6075
-	method:distance	missing_rate:0.2	accuracy:0.22448979591836735
-	method:distance	missing_rate:0.1	accuracy:0.2403846153846154
-	method:distance	missing_rate:0.01	accuracy:0.5608465608465608
-	method:distance	missing_rate:0.01	accuracy:0.6301369863013698
-	method:gaussian	missing_rate:0.3	accuracy:0.9775
-	method:distance	missing_rate:0.3	accuracy:0.705
-	method:gaussian	missing_rate:0.3	accuracy:0.975
-	method:distance	missing_rate:0.3	accuracy:0.965
-改正基于距离的方法后：
-	method:gaussian	missing_rate:0.1	accuracy:0.98
-	method:gaussian	missing_rate:0.2	accuracy:0.975
-	method:gaussian	missing_rate:0.3	accuracy:0.9775
-	method:gaussian	missing_rate:0.4	accuracy:0.9775
-	method:gaussian	missing_rate:0.5	accuracy:0.95
-	method:distance	missing_rate:0.1	accuracy:0.9875
-	method:distance	missing_rate:0.2	accuracy:0.975
-	method:distance	missing_rate:0.3	accuracy:0.9575
-	method:distance	missing_rate:0.4	accuracy:0.9575
-	method:distance	missing_rate:0.5	accuracy:0.9225
-基于距离的方法在缺失率较高时表现较差，改正后的方法在缺失率较高时表现较好。
-重新生成缺失索引矩阵进行第二次比较：
+v1.1 
+compare_methods:随机采样n_sample个加权平均
+	method:distance	missing_rate:0.0	accuracy:0.7771428571428571
+	method:distance	missing_rate:0.1	accuracy:0.7828571428571428
+	method:distance	missing_rate:0.2	accuracy:0.7542857142857143
+	method:distance	missing_rate:0.3	accuracy:0.7314285714285714
+	method:distance	missing_rate:0.4	accuracy:0.7085714285714285
+	method:distance	missing_rate:0.5	accuracy:0.7371428571428571
 
-	method:gaussian	missing_rate:0.1	accuracy:0.9775
-	method:gaussian	missing_rate:0.1	accuracy:0.98
-	method:gaussian	missing_rate:0.2	accuracy:0.975
-	method:gaussian	missing_rate:0.2	accuracy:0.9775
-	method:gaussian	missing_rate:0.3	accuracy:0.975
-	method:gaussian	missing_rate:0.3	accuracy:0.9725
-	method:gaussian	missing_rate:0.4	accuracy:0.9675
-	method:gaussian	missing_rate:0.4	accuracy:0.975
-	method:gaussian	missing_rate:0.5	accuracy:0.9575
-	method:gaussian	missing_rate:0.5	accuracy:0.9625
-	method:distance	missing_rate:0.1	accuracy:0.975
-	method:distance	missing_rate:0.1	accuracy:0.97
-	method:distance	missing_rate:0.2	accuracy:0.96
-	method:distance	missing_rate:0.2	accuracy:0.9625
-	method:distance	missing_rate:0.3	accuracy:0.96
-	method:distance	missing_rate:0.3	accuracy:0.96
-	method:distance	missing_rate:0.4	accuracy:0.9575
-	method:distance	missing_rate:0.4	accuracy:0.955
-	method:distance	missing_rate:0.5	accuracy:0.94
-	method:distance	missing_rate:0.5	accuracy:0.9425
-添加加权平均计算步骤后：
-	method:distance	missing_rate:0.5	accuracy:0.9425
-	method:distance	missing_rate:0.5	accuracy:0.9425
-	method:gaussian	missing_rate:0.5	accuracy:0.9625
-	method:distance	missing_rate:0.4	accuracy:0.9525
-	method:gaussian	missing_rate:0.4	accuracy:0.97
-	method:distance	missing_rate:0.4	accuracy:0.9525
-	method:distance	missing_rate:0.3	accuracy:0.9425
-	method:gaussian	missing_rate:0.3	accuracy:0.975
-	method:distance	missing_rate:0.3	accuracy:0.94
-	method:distance	missing_rate:0.2	accuracy:0.9675
-	method:gaussian	missing_rate:0.2	accuracy:0.9725
-	method:distance	missing_rate:0.5	accuracy:0.9375
-	method:gaussian	missing_rate:0.5	accuracy:0.955
-更换数据集为BRAC.mat：
-	method:gaussian	missing_rate:0.1	accuracy:0.7771428571428571
-	method:distance	missing_rate:0.1	accuracy:0.7714285714285715
-	method:gaussian	missing_rate:0.1	accuracy:0.7714285714285715
-	method:distance	missing_rate:0.1	accuracy:0.7485714285714286
-	method:gaussian	missing_rate:0.2	accuracy:0.7314285714285714
-	method:distance	missing_rate:0.2	accuracy:0.7257142857142858
-	method:gaussian	missing_rate:0.2	accuracy:0.7314285714285714
-	method:gaussian	missing_rate:0.2	accuracy:0.72
-	method:distance	missing_rate:0.2	accuracy:0.7142857142857143
-	method:gaussian	missing_rate:0.2	accuracy:0.7314285714285714
+	method:gaussian	missing_rate:0.0	accuracy:0.7714285714285715
+	method:gaussian	missing_rate:0.1	accuracy:0.7942857142857143
 	method:gaussian	missing_rate:0.2	accuracy:0.7371428571428571
-	method:gaussian	missing_rate:0.2	accuracy:0.7257142857142858
-	method:gaussian	missing_rate:0.2	accuracy:0.72
-	method:gaussian	missing_rate:0.2	accuracy:0.7371428571428571
-	method:distance	missing_rate:0.2	accuracy:0.7314285714285714
-	method:distance	missing_rate:0.3	accuracy:0.7371428571428571
-	method:gaussian	missing_rate:0.3	accuracy:0.76
-	method:distance	missing_rate:0.4	accuracy:0.7142857142857143
-	method:gaussian	missing_rate:0.4	accuracy:0.7085714285714285
-	method:gaussian	missing_rate:0.4	accuracy:0.7085714285714285
-	method:distance	missing_rate:0.4	accuracy:0.72
-	method:distance	missing_rate:0.5	accuracy:0.6742857142857143
+	method:gaussian	missing_rate:0.3	accuracy:0.7371428571428571
+	method:gaussian	missing_rate:0.4	accuracy:0.7142857142857143
 	method:gaussian	missing_rate:0.5	accuracy:0.68
-	method:distance	missing_rate:0.5	accuracy:0.68
-	method:distance	missing_rate:0.5	accuracy:0.6914285714285714
+一次运行：0.2 0.5胜
+compare_methods:随机采样n_sample个加权平均,测试集不重复采样
+	method:distance	missing_rate:0.0	accuracy:0.7828571428571428
+	method:distance	missing_rate:0.1	accuracy:0.7714285714285715
+	method:distance	missing_rate:0.2	accuracy:0.76
+	method:distance	missing_rate:0.3	accuracy:0.7485714285714286
+	method:distance	missing_rate:0.4	accuracy:0.7085714285714285
+	method:distance	missing_rate:0.5	accuracy:0.72
+
+	method:gaussian	missing_rate:0.0	accuracy:0.7885714285714286
+	method:gaussian	missing_rate:0.1	accuracy:0.76
+	method:gaussian	missing_rate:0.2	accuracy:0.7428571428571429
+	method:gaussian	missing_rate:0.3	accuracy:0.72
+	method:gaussian	missing_rate:0.4	accuracy:0.7314285714285714
 	method:gaussian	missing_rate:0.5	accuracy:0.6971428571428572
-	method:distance	missing_rate:0.5	accuracy:0.6857142857142857
-	method:distance	missing_rate:0.5	accuracy:0.6971428571428572
-	method:distance	missing_rate:0.5	accuracy:0.6628571428571428
-	method:distance	missing_rate:0.5	accuracy:0.68
-	method:distance	missing_rate:0.5	accuracy:0.6628571428571428
-	method:gaussian	missing_rate:0.5	accuracy:0.6857142857142857
-测试集使用n_sample个平均（n_sample个填充）：（之前是随机采样）
-	method:distance	missing_rate:0.5	accuracy:0.68
-	method:distance	missing_rate:0.5	accuracy:0.7142857142857143
-	method:distance	missing_rate:0.5	accuracy:0.68
-	method:distance	missing_rate:0.5	accuracy:0.6971428571428572
-
-	method:distance	missing_rate:0.4	accuracy:0.7428571428571429
-	method:distance	missing_rate:0.4	accuracy:0.7257142857142858
-	method:gaussian	missing_rate:0.4	accuracy:0.7085714285714285
-	method:gaussian	missing_rate:0.4	accuracy:0.6857142857142857
-	method:gaussian	missing_rate:0.4	accuracy:0.7085714285714285
-	
-	method:distance	missing_rate:0.3	accuracy:0.7371428571428571
-	method:distance	missing_rate:0.3	accuracy:0.7371428571428571
-	method:distance	missing_rate:0.3	accuracy:0.7257142857142858
-	method:gaussian	missing_rate:0.3	accuracy:0.7657142857142857
-	method:gaussian	missing_rate:0.3	accuracy:0.7714285714285715
-	method:gaussian	missing_rate:0.3	accuracy:0.7771428571428571
-	
-	method:distance	missing_rate:0.2	accuracy:0.72
-	method:distance	missing_rate:0.2	accuracy:0.7314285714285714
-	method:distance	missing_rate:0.2	accuracy:0.72
-	method:gaussian	missing_rate:0.2	accuracy:0.7314285714285714
-	method:gaussian	missing_rate:0.2	accuracy:0.72
-	method:gaussian	missing_rate:0.2	accuracy:0.7142857142857143
-
-	method:distance	missing_rate:0.1	accuracy:0.7257142857142858
-	method:distance	missing_rate:0.1	accuracy:0.7428571428571429
-	method:distance	missing_rate:0.1	accuracy:0.7428571428571429
-	method:gaussian	missing_rate:0.1	accuracy:0.7771428571428571
-	method:gaussian	missing_rate:0.1	accuracy:0.7828571428571428
-	method:gaussian	missing_rate:0.1	accuracy:0.7828571428571428
-
-将平均改为加权平均（测试集的填充）：
-	method:distance	missing_rate:0.1	accuracy:0.76
-	method:distance	missing_rate:0.1	accuracy:0.76
-	method:distance	missing_rate:0.1	accuracy:0.7485714285714286
-
-	method:distance	missing_rate:0.2	accuracy:0.7314285714285714
-	method:distance	missing_rate:0.2	accuracy:0.72
-	method:distance	missing_rate:0.2	accuracy:0.7257142857142858
-
-	method:distance	missing_rate:0.3	accuracy:0.7257142857142858
-	method:distance	missing_rate:0.3	accuracy:0.7314285714285714
-	method:distance	missing_rate:0.3	accuracy:0.7314285714285714
-
-	method:distance	missing_rate:0.4	accuracy:0.7428571428571429
-	method:distance	missing_rate:0.4	accuracy:0.7371428571428571
-	method:distance	missing_rate:0.4	accuracy:0.7314285714285714
-
-	method:distance	missing_rate:0.5	accuracy:0.6914285714285714
-	method:distance	missing_rate:0.5	accuracy:0.68
-	method:distance	missing_rate:0.5	accuracy:0.68
-将表现不好的几个数据集重新生成缺失索引：（0.1 0.3）
-
-	method:gaussian	missing_rate:0.1	accuracy:0.7885714285714286
-	method:distance	missing_rate:0.1	accuracy:0.7428571428571429
-	method:distance	missing_rate:0.1	accuracy:0.7542857142857143
-	method:distance	missing_rate:0.1	accuracy:0.7542857142857143
-0.1重新生成缺失索引矩阵进行第二次比较：
-	method:gaussian	missing_rate:0.1	accuracy:0.76
-	method:distance	missing_rate:0.1	accuracy:0.7371428571428571
-	method:distance	missing_rate:0.1	accuracy:0.7371428571428571
-0.1重新生成缺失索引矩阵进行第三次比较：
-	method:gaussian	missing_rate:0.1	accuracy:0.7657142857142857
-	method:distance	missing_rate:0.1	accuracy:0.72
-	method:distance	missing_rate:0.1	accuracy:0.7428571428571429
-	method:distance	missing_rate:0.1	accuracy:0.72
-	method:distance	missing_rate:0.1	accuracy:0.7314285714285714
-	method:distance	missing_rate:0.1	accuracy:0.7428571428571429
-0.1重新生成缺失索引矩阵进行第四次比较：
-	method:gaussian	missing_rate:0.1	accuracy:0.76
-	method:distance	missing_rate:0.1	accuracy:0.76
-	method:distance	missing_rate:0.1	accuracy:0.7485714285714286
-	method:distance	missing_rate:0.1	accuracy:0.7657142857142857
-	method:distance	missing_rate:0.1	accuracy:0.76
+一次运行：0.1 0.2 0.3 0.5胜

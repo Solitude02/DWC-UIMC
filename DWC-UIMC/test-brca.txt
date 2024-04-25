@@ -1,0 +1,13 @@
+测试实验：
+	method:gaussian	missing_rate:0.0	accuracy:0.7771428571428571
+	method:gaussian	missing_rate:0.0	accuracy:0.7714285714285715
+	method:gaussian	missing_rate:0.0	accuracy:0.7885714285714286
+	method:gaussian	missing_rate:0.0	accuracy:0.7771428571428571
+	method:gaussian	missing_rate:0.0	accuracy:0.7771428571428571
+	method:distance	missing_rate:0.0	accuracy:0.7828571428571428
+	method:distance	missing_rate:0.0	accuracy:0.7657142857142857
+	method:distance	missing_rate:0.0	accuracy:0.7657142857142857
+	method:distance	missing_rate:0.0	accuracy:0.7828571428571428
+	method:distance	missing_rate:0.0	accuracy:0.7714285714285715
+
+

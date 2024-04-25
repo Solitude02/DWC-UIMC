@@ -71,7 +71,7 @@ if __name__ == "__main__":
     parser.add_argument('--n-sample', type=int, default=30, metavar='LR',
                         help='times of sampling [default: 10]')
     # 邻居数，默认10
-    parser.add_argument('--k', type=int, default=10, metavar='LR',
+    parser.add_argument('--k', type=int, default=15, metavar='LR',
                         help='number of neighbors [default: 10]')
     # 测试邻居数，默认10
     parser.add_argument('--k_test', type=int, default=10, metavar='LR',
@@ -238,7 +238,7 @@ if __name__ == "__main__":
 
 
     # with open("./test-hand.txt", "a") as f:
-    with open("./test-brac.txt", "a") as f:     
+    with open("./test-brca.txt", "a") as f:     
         text = "\tmethod:" + args.method + "\tmissing_rate:" + str(missing_rate) + "\taccuracy:" + str(acc) +"\n"
         f.write(text)
     f.close()

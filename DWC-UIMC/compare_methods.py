@@ -3,6 +3,7 @@ from util import mv_dataset, read_mymat, build_ad_dataset, process_data, get_val
     mv_tabular_collate
 from scipy.spatial.distance import cdist
 from icecream import ic
+ic.disable()
 
 # 定义一个正则化参数，用于多元高斯分布的协方差矩阵的正则化，以防止过拟合。
 reg_param  = 1e-3
@@ -21,7 +22,7 @@ def get_samples(x, y, sn, train_index, test_index, n_sample, k, if_mean=False, r
     # 计算每个视图中都存在的样本索引
     for i in range(view_num - 1):
         for j in range(i + 1, view_num):
-            # i和j视图中都存在的样本索引，即完整样本
+            # i和j视图中都存在的样本索引
             sn_temp = sn[:, [i, j]]
             sn_temp_sum = np.sum(sn_temp, axis=1)
             sn_temp_sum[test_index] = 0
@@ -46,9 +47,9 @@ def get_samples(x, y, sn, train_index, test_index, n_sample, k, if_mean=False, r
     y_incomplete = np.repeat(y_train[x_train_miss_index], n_sample, axis=0)
     sn_incomplete = np.repeat(sn_train[x_train_miss_index], n_sample, axis=0)
 
-    print("计算训练集距离")
-    x_train_full = [np.concatenate((x_complete[_], x_incomplete[_]), axis=0) for _ in range(view_num)]
-    dist_train_set = [cdist(x_train_full[i], x_train_full[i], 'euclidean') for i in range(view_num)]
+    # print("计算训练集距离")
+    # x_train_full = [np.concatenate((x_complete[_], x_incomplete[_]), axis=0) for _ in range(view_num)]
+    # dist_train_set = [cdist(x_train_full[i], x_train_full[i], 'euclidean') for i in range(view_num)]
 
     index = 0
     for i in x_train_miss_index: # 遍历缺失视图的索引
@@ -56,28 +57,29 @@ def get_samples(x, y, sn, train_index, test_index, n_sample, k, if_mean=False, r
         miss_view_index = np.nonzero(sn_train[i] == 0)[0] # 获取缺失视图的索引
         for v in miss_view_index:
             # 获取同类完整样本集的索引
-            same_class_index = np.where(y_complete == y_i)[0]
+            same_class_index = np.where(y_train[x_train_dissmiss_index] == y_i)[0]
             same_class_complete_samples = x_complete[v][same_class_index]
             # 计算距离
-            dist_v = dist_train_set[v][i, same_class_index]
+            dist_v = dist_all_set[v][i, same_class_index]
             # 使用公式计算权重
             weights = np.exp(-dist_v / np.max(dist_v)) # 距离越近，权重越大
             # 对权重进行归一化
             weights /= np.sum(weights)
-            x_samples_temp = np.zeros((n_sample, same_class_complete_samples.shape[1]), dtype=np.float_)
+            x_samples_average_temp = np.zeros((n_sample, same_class_complete_samples.shape[1]), dtype=np.float_)
             for s in range(n_sample):
                 # 随机采样
-                chosen_indices = np.random.choice(len(same_class_complete_samples), n_sample, p=weights)
+                chosen_indices = np.random.choice(len(same_class_complete_samples), 5, p=weights)
                 chosen_samples = same_class_complete_samples[chosen_indices]
                 chosen_weights = weights[chosen_indices]
                 chosen_weights /= chosen_weights.sum()
                 # 在选中样本的范围内进行归一化再加权平均
                 fill_value = np.average(chosen_samples, weights=chosen_weights, axis=0)
-                x_samples_temp[s] = fill_value
-            x_incomplete[v][index * n_sample:(index + 1) * n_sample] = x_samples_temp
+                x_samples_average_temp[s] = fill_value
+            x_incomplete[v][index * n_sample:(index + 1) * n_sample] = x_samples_average_temp
         index += 1
 
     x_train = [np.concatenate((x_complete[_], x_incomplete[_]), axis=0) for _ in range(view_num)]
+    ic(x_train[0].shape)
     x_train = process_data(x_train, view_num)
     y_train = np.concatenate((y_complete, y_incomplete), axis=0)
     Sn_train = np.concatenate((sn_complete, sn_incomplete), axis=0)
@@ -127,25 +129,27 @@ def get_samples(x, y, sn, train_index, test_index, n_sample, k, if_mean=False, r
         
                 # 从近邻集中基于距离随机采样填充缺失视图
                 x_neighbors_temp = x[j][neighbors_index_temp] # 补全第j个视图的邻居集
+                ic(x_neighbors_temp.shape)
                 # 计算概率
                 dist_j = dist_all_set[j][i, neighbors_index_temp] # 计算距离
                 probabilities = np.exp(-dist_j / np.max(dist_j))
                 # 归一化概率
                 probabilities /= probabilities.sum()
-                x_samples_temp = np.array([], dtype=np.float_)
+                x_samples_average_temp = np.empty((n_sample, x_neighbors_temp.shape[1]), dtype=np.float_)
                 for s in range(n_sample):
                     rng = np.random.default_rng() # 随机数生成器
                     # 选择样本的索引
-                    sample_indices = rng.choice(len(x_neighbors_temp), size=n_sample, replace=True, p=probabilities)
+                    sample_indices = rng.choice(len(x_neighbors_temp), size=5, replace=False, p=probabilities)
                     x_samples_temp = x_neighbors_temp[sample_indices]
                     # 在选中的样本范围内重新计算并归一化权重
                     weights_temp = probabilities[sample_indices]
                     weights_temp /= weights_temp.sum()
                     # 计算加权平均值作为填充值
                     fill_value = np.average(x_samples_temp, weights=weights_temp, axis=0)
-                    x_samples_temp[s] = fill_value
-                x_i[j] = x_samples_temp # 随机选取n_sample个样本
+                    x_samples_average_temp[s] = fill_value
+                x_i[j] = x_samples_average_temp # 随机选取n_sample个样本
             x_test = [np.concatenate((x_test[_], x_i[_]), axis=0) for _ in range(view_num)] # 连接所有视图
+            ic(x_test[0].shape)
             y_test = np.concatenate((y_test, y_i), axis=0) # 连接所有标签
     x_test = process_data(x_test, view_num)
 
@@ -163,5 +167,5 @@ if __name__ == '__main__':
 
     X = process_data(X, view_num)
     print(partition['train'].shape, partition['test'].shape)
-    X_train, Y_train, X_test, Y_test, Sn_train=get_samples(X, Y, Sn, partition['train'], partition['test'], 5, 10)
+    X_train, Y_train, X_test, Y_test, Sn_train=get_samples(X, Y, Sn, partition['train'], partition['test'], 5, 15)
     print(X_train[0].shape, Y_train.shape, X_test[0].shape, Y_test.shape, Sn_train.shape)
