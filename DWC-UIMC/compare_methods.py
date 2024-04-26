@@ -129,7 +129,7 @@ def get_samples(x, y, sn, train_index, test_index, n_sample, k, if_mean=False, r
                 probabilities = np.exp(-dist_j / np.max(dist_j))
                 # 归一化概率
                 probabilities /= probabilities.sum()
-                x_samples_average_temp = np.array([], dtype=np.float_)
+                x_samples_average_temp = np.zeros((n_sample, x_neighbors_temp.shape[1]), dtype=np.float_)
                 for s in range(n_sample):
                     rng = np.random.default_rng() # 随机数生成器
                     # 选择样本的索引
