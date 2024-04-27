@@ -39,6 +39,9 @@ def get_samples(x, y, sn, train_index, test_index, n_sample, k, if_mean=False, r
     x_complete = [np.repeat(x_train[_][x_train_dissmiss_index], n_sample, axis=0) for _ in range(view_num)]
     y_complete = np.repeat(y_train[x_train_dissmiss_index], n_sample, axis=0)
     sn_complete = np.repeat(sn_train[x_train_dissmiss_index], n_sample, axis=0)
+    # x_complete = [x_train[_][x_train_dissmiss_index] for _ in range(view_num)]
+    # y_complete = y_train[x_train_dissmiss_index]
+    # sn_complete = sn_train[x_train_dissmiss_index]
     
 
     # step4: 填充不完整视图
@@ -152,7 +155,9 @@ def get_samples(x, y, sn, train_index, test_index, n_sample, k, if_mean=False, r
 if __name__ == '__main__':
     # dataset_name = 'handwritten0.mat'
     # view_num = 6
-    dataset_name = 'BRCA.mat'
+    # dataset_name = 'BRCA.mat'
+    # view_num = 3
+    dataset_name = 'ROSMAP.mat'
     view_num = 3
     missing_rate = 0.1
     X, Y, Sn = read_mymat('./data/', dataset_name, ['X', 'Y'], missing_rate)

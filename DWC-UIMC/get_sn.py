@@ -90,7 +90,10 @@ def load_Sn(str_name):
 if __name__ == '__main__':
     missrate = 0.2
     dataset_name_list = ['handwritten0.mat','BRCA.mat','ROSMAP.mat']
-    dataset_name = dataset_name_list[0]
+    # dataset_name = dataset_name_list[0]
+    # dataset_name = dataset_name_list[1]
+    dataset_name = dataset_name_list[2]
+
     if dataset_name == 'handwritten0.mat':
         sn = get_sn(6,2000,missrate) # handwrite0.mat
         save_Sn(sn,'./handwritten_sh_'+ str(missrate)[2:]+'.csv')
@@ -98,6 +101,7 @@ if __name__ == '__main__':
         sn = get_sn(3,875,missrate) # BRCA.mat
         save_Sn(sn,'./BRCA_sh_'+ str(missrate)[2:]+'.csv')
     elif dataset_name == 'ROSMAP.mat':
-        sn = get_sn(3,107,missrate) # ROSMAP.mat
+        sn = get_sn(3,351,missrate) # ROSMAP.mat
+        save_Sn(sn,'./ROSMAP_sh_'+ str(missrate)[2:]+'.csv')
 
 

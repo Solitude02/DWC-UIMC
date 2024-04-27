@@ -93,9 +93,9 @@ if __name__ == "__main__":
     # 使用'handwritten0.mat'数据集
     # dataset_name = 'handwritten0.mat'
     # 使用'BRCA'数据集
-    dataset_name = 'BRCA.mat'
+    # dataset_name = 'BRCA.mat'
     # 使用'ROSMAP'数据集
-    # dataset_name = 'ROSMAP.mat'
+    dataset_name = 'ROSMAP.mat'
 
     # 设置编码器、解码器和分类器的维度
     if dataset_name == 'handwritten0.mat':

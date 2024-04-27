@@ -1,0 +1,223 @@
+	method:distance	missing_rate:0.0	accuracy:0.8285714285714286
+	method:distance	missing_rate:0.1	accuracy:0.8571428571428571
+	method:distance	missing_rate:0.2	accuracy:0.7571428571428571
+	method:distance	missing_rate:0.3	accuracy:0.8142857142857143
+	method:distance	missing_rate:0.4	accuracy:0.6714285714285714
+	method:distance	missing_rate:0.5	accuracy:0.7857142857142857
+
+	method:gaussian	missing_rate:0.5	accuracy:0.7571428571428571
+	method:gaussian	missing_rate:0.1	accuracy:0.8571428571428571
+	method:gaussian	missing_rate:0.2	accuracy:0.7857142857142857
+	method:gaussian	missing_rate:0.3	accuracy:0.7571428571428571
+	method:gaussian	missing_rate:0.4	accuracy:0.6428571428571429
+	method:gaussian	missing_rate:0.5	accuracy:0.6714285714285714
+	method:gaussian	missing_rate:0.5	accuracy:0.6428571428571429
+
+测试实验：
+
+	method:distance	missing_rate:0.0	accuracy:0.8857142857142857
+	method:distance	missing_rate:0.0	accuracy:0.8571428571428571
+	method:distance	missing_rate:0.0	accuracy:0.8857142857142857
+	method:distance	missing_rate:0.0	accuracy:0.8714285714285714
+	method:distance	missing_rate:0.0	accuracy:0.8285714285714286
+	method:gaussian	missing_rate:0.0	accuracy:0.8428571428571429
+	method:gaussian	missing_rate:0.0	accuracy:0.8857142857142857
+	method:gaussian	missing_rate:0.0	accuracy:0.8714285714285714
+	method:gaussian	missing_rate:0.0	accuracy:0.8571428571428571
+	method:gaussian	missing_rate:0.0	accuracy:0.8714285714285714
+0.8857142857142857
+
+	method:distance	missing_rate:0.1	accuracy:0.8571428571428571
+	method:distance	missing_rate:0.1	accuracy:0.8857142857142857
+	method:distance	missing_rate:0.1	accuracy:0.8571428571428571
+	method:distance	missing_rate:0.1	accuracy:0.8714285714285714
+	method:distance	missing_rate:0.1	accuracy:0.8571428571428571
+	method:distance	missing_rate:0.1	accuracy:0.8714285714285714
+	method:distance	missing_rate:0.1	accuracy:0.8571428571428571
+	method:distance	missing_rate:0.1	accuracy:0.8428571428571429
+	method:distance	missing_rate:0.1	accuracy:0.8714285714285714
+	method:distance	missing_rate:0.1	accuracy:0.8571428571428571
+(0.8857142857142857+0.8714285714285714+0.8714285714285714)/3 = 0.8761904761904761666666666
+
+	method:gaussian	missing_rate:0.1	accuracy:0.8428571428571429
+	method:gaussian	missing_rate:0.1	accuracy:0.8428571428571429
+	method:gaussian	missing_rate:0.1	accuracy:0.8428571428571429
+	method:gaussian	missing_rate:0.1	accuracy:0.8714285714285714
+	method:gaussian	missing_rate:0.1	accuracy:0.8428571428571429
+	method:gaussian	missing_rate:0.1	accuracy:0.8428571428571429
+	method:gaussian	missing_rate:0.1	accuracy:0.8857142857142857
+	method:gaussian	missing_rate:0.1	accuracy:0.8142857142857143
+	method:gaussian	missing_rate:0.1	accuracy:0.8285714285714286
+	method:gaussian	missing_rate:0.1	accuracy:0.8857142857142857
+(0.8857142857142857+0.8857142857142857+0.8714285714285714)/3 = 0.8809523809523809333333
+	
+	method:distance	missing_rate:0.2	accuracy:0.8571428571428571
+	method:distance	missing_rate:0.2	accuracy:0.8571428571428571
+	method:distance	missing_rate:0.2	accuracy:0.8857142857142857
+	method:distance	missing_rate:0.2	accuracy:0.7714285714285715
+	method:distance	missing_rate:0.2	accuracy:0.7857142857142857
+	method:distance	missing_rate:0.2	accuracy:0.8571428571428571
+	method:distance	missing_rate:0.2	accuracy:0.7714285714285715
+	method:distance	missing_rate:0.2	accuracy:0.8857142857142857
+	method:distance	missing_rate:0.2	accuracy:0.8571428571428571
+	method:distance	missing_rate:0.2	accuracy:0.7714285714285715
+(0.8857142857142857+0.8857142857142857+0.8571428571428571)/3 = 0.8761904761904761666666666666666
+
+	method:gaussian	missing_rate:0.2	accuracy:0.8
+	method:gaussian	missing_rate:0.2	accuracy:0.8428571428571429
+	method:gaussian	missing_rate:0.2	accuracy:0.8285714285714286
+	method:gaussian	missing_rate:0.2	accuracy:0.8285714285714286
+	method:gaussian	missing_rate:0.2	accuracy:0.8142857142857143
+	method:gaussian	missing_rate:0.2	accuracy:0.8142857142857143
+	method:gaussian	missing_rate:0.2	accuracy:0.8
+	method:gaussian	missing_rate:0.2	accuracy:0.8
+	method:gaussian	missing_rate:0.2	accuracy:0.8285714285714286
+	method:gaussian	missing_rate:0.2	accuracy:0.8142857142857143
+(0.8285714285714286+0.8285714285714286+0.8428571428571429)/3 = 0.83333333333333336666666666666
+
+	method:distance	missing_rate:0.3	accuracy:0.8285714285714286
+	method:distance	missing_rate:0.3	accuracy:0.8285714285714286
+	method:distance	missing_rate:0.3	accuracy:0.7857142857142857
+	method:distance	missing_rate:0.3	accuracy:0.8285714285714286
+	method:distance	missing_rate:0.3	accuracy:0.8571428571428571
+	method:distance	missing_rate:0.3	accuracy:0.8142857142857143
+	method:distance	missing_rate:0.3	accuracy:0.8142857142857143
+	method:distance	missing_rate:0.3	accuracy:0.8285714285714286
+	method:distance	missing_rate:0.3	accuracy:0.8
+	method:distance	missing_rate:0.3	accuracy:0.8285714285714286
+(0.8571428571428571+0.8285714285714286+0.8285714285714286)/3 = 0.8380952380952381	
+
+	method:gaussian	missing_rate:0.3	accuracy:0.7857142857142857
+	method:gaussian	missing_rate:0.3	accuracy:0.8142857142857143
+	method:gaussian	missing_rate:0.3	accuracy:0.8428571428571429
+	method:gaussian	missing_rate:0.3	accuracy:0.7571428571428571
+	method:gaussian	missing_rate:0.3	accuracy:0.7428571428571429
+	method:gaussian	missing_rate:0.3	accuracy:0.8285714285714286
+	method:gaussian	missing_rate:0.3	accuracy:0.7857142857142857
+	method:gaussian	missing_rate:0.3	accuracy:0.8
+	method:gaussian	missing_rate:0.3	accuracy:0.7714285714285715
+	method:gaussian	missing_rate:0.3	accuracy:0.7714285714285715
+(0.8285714285714286+0.8428571428571429+0.8142857142857143)/3 = 0.8285714285714286	
+	
+	method:gaussian	missing_rate:0.4	accuracy:0.7
+	method:gaussian	missing_rate:0.4	accuracy:0.7142857142857143
+	method:gaussian	missing_rate:0.4	accuracy:0.6714285714285714
+	method:gaussian	missing_rate:0.4	accuracy:0.6714285714285714
+	method:gaussian	missing_rate:0.4	accuracy:0.7
+	method:gaussian	missing_rate:0.4	accuracy:0.6714285714285714
+	method:gaussian	missing_rate:0.4	accuracy:0.6714285714285714
+	method:gaussian	missing_rate:0.4	accuracy:0.6857142857142857
+	method:gaussian	missing_rate:0.4	accuracy:0.7428571428571429
+	method:gaussian	missing_rate:0.4	accuracy:0.7
+(0.7428571428571429+0.7142857142857143+0.7)/3 = 0.71904761904761906666666666666
+
+	method:distance	missing_rate:0.4	accuracy:0.6714285714285714
+	method:distance	missing_rate:0.4	accuracy:0.7142857142857143
+	method:distance	missing_rate:0.4	accuracy:0.7142857142857143
+	method:distance	missing_rate:0.4	accuracy:0.6714285714285714
+	method:distance	missing_rate:0.4	accuracy:0.7
+	method:distance	missing_rate:0.4	accuracy:0.7428571428571429
+	method:distance	missing_rate:0.4	accuracy:0.7
+	method:distance	missing_rate:0.4	accuracy:0.6714285714285714
+	method:distance	missing_rate:0.4	accuracy:0.6714285714285714
+	method:distance	missing_rate:0.4	accuracy:0.7428571428571429
+(0.7428571428571429+0.7428571428571429+0.7142857142857143)/3 = 0.73333333333333336666666666666
+
+	method:distance	missing_rate:0.5	accuracy:0.8
+	method:distance	missing_rate:0.5	accuracy:0.7571428571428571
+	method:distance	missing_rate:0.5	accuracy:0.7714285714285715
+	method:distance	missing_rate:0.5	accuracy:0.7857142857142857
+	method:distance	missing_rate:0.5	accuracy:0.7857142857142857
+	method:distance	missing_rate:0.5	accuracy:0.7714285714285715
+	method:distance	missing_rate:0.5	accuracy:0.7714285714285715
+	method:distance	missing_rate:0.5	accuracy:0.7714285714285715
+	method:distance	missing_rate:0.5	accuracy:0.7571428571428571
+	method:distance	missing_rate:0.5	accuracy:0.7571428571428571
+(0.7857142857142857+0.7857142857142857+0.8)/3 = 0.7904761904761904666666666666
+
+	method:gaussian	missing_rate:0.5	accuracy:0.6571428571428571
+	method:gaussian	missing_rate:0.5	accuracy:0.6142857142857143
+	method:gaussian	missing_rate:0.5	accuracy:0.6428571428571429
+	method:gaussian	missing_rate:0.5	accuracy:0.6285714285714286
+	method:gaussian	missing_rate:0.5	accuracy:0.6
+	method:gaussian	missing_rate:0.5	accuracy:0.6285714285714286
+	method:gaussian	missing_rate:0.5	accuracy:0.6714285714285714
+	method:gaussian	missing_rate:0.5	accuracy:0.6285714285714286
+	method:gaussian	missing_rate:0.5	accuracy:0.6571428571428571
+	method:gaussian	missing_rate:0.5	accuracy:0.6571428571428571
+0.6571428571428571
+
+MI:
+
+	method:mean	missing_rate:0.0	accuracy:0.7428571428571429
+	method:mean	missing_rate:0.0	accuracy:0.7571428571428571
+	method:mean	missing_rate:0.0	accuracy:0.7428571428571429
+	method:mean	missing_rate:0.0	accuracy:0.7
+	method:mean	missing_rate:0.0	accuracy:0.7428571428571429
+	method:mean	missing_rate:0.0	accuracy:0.7285714285714285
+	method:mean	missing_rate:0.0	accuracy:0.7285714285714285
+	method:mean	missing_rate:0.0	accuracy:0.7142857142857143
+	method:mean	missing_rate:0.0	accuracy:0.7428571428571429
+	method:mean	missing_rate:0.0	accuracy:0.7428571428571429
+(0.7571428571428571+0.7428571428571429+0.7428571428571429)/3 = 0.747619047619047633333333
+
+	method:mean	missing_rate:0.1	accuracy:0.7
+	method:mean	missing_rate:0.1	accuracy:0.6857142857142857
+	method:mean	missing_rate:0.1	accuracy:0.6857142857142857
+	method:mean	missing_rate:0.1	accuracy:0.7
+	method:mean	missing_rate:0.1	accuracy:0.6714285714285714
+	method:mean	missing_rate:0.1	accuracy:0.7
+	method:mean	missing_rate:0.1	accuracy:0.7428571428571429
+	method:mean	missing_rate:0.1	accuracy:0.7
+	method:mean	missing_rate:0.1	accuracy:0.6857142857142857
+	method:mean	missing_rate:0.1	accuracy:0.7142857142857143
+(0.7428571428571429+0.7+0.7)/3 = 0.7142857142857143
+
+
+	method:mean	missing_rate:0.2	accuracy:0.6428571428571429
+	method:mean	missing_rate:0.2	accuracy:0.6714285714285714
+	method:mean	missing_rate:0.2	accuracy:0.7
+	method:mean	missing_rate:0.2	accuracy:0.6714285714285714
+	method:mean	missing_rate:0.2	accuracy:0.6714285714285714
+	method:mean	missing_rate:0.2	accuracy:0.7142857142857143
+	method:mean	missing_rate:0.2	accuracy:0.6857142857142857
+	method:mean	missing_rate:0.2	accuracy:0.6714285714285714
+	method:mean	missing_rate:0.2	accuracy:0.6857142857142857
+	method:mean	missing_rate:0.2	accuracy:0.7142857142857143
+(0.7142857142857143+0.7142857142857143+0.7)/3 = 0.7095238095238095333333333333333
+
+	method:mean	missing_rate:0.3	accuracy:0.6857142857142857
+	method:mean	missing_rate:0.3	accuracy:0.6857142857142857
+	method:mean	missing_rate:0.3	accuracy:0.6857142857142857
+	method:mean	missing_rate:0.3	accuracy:0.6857142857142857
+	method:mean	missing_rate:0.3	accuracy:0.7
+	method:mean	missing_rate:0.3	accuracy:0.6857142857142857
+	method:mean	missing_rate:0.3	accuracy:0.6857142857142857
+	method:mean	missing_rate:0.3	accuracy:0.6714285714285714
+	method:mean	missing_rate:0.3	accuracy:0.6714285714285714
+	method:mean	missing_rate:0.3	accuracy:0.6857142857142857
+(0.6857142857142857+0.7+0.6857142857142857)/3 = 0.690476190476190466666666666
+
+	method:mean	missing_rate:0.4	accuracy:0.6285714285714286
+	method:mean	missing_rate:0.4	accuracy:0.6571428571428571
+	method:mean	missing_rate:0.4	accuracy:0.6571428571428571
+	method:mean	missing_rate:0.4	accuracy:0.6714285714285714
+	method:mean	missing_rate:0.4	accuracy:0.6714285714285714
+	method:mean	missing_rate:0.4	accuracy:0.6428571428571429
+	method:mean	missing_rate:0.4	accuracy:0.6571428571428571
+	method:mean	missing_rate:0.4	accuracy:0.6857142857142857
+	method:mean	missing_rate:0.4	accuracy:0.6571428571428571
+	method:mean	missing_rate:0.4	accuracy:0.6857142857142857
+(0.6857142857142857+0.6857142857142857+0.6714285714285714)/3 = 0.68095238095238093333333333333
+
+	method:mean	missing_rate:0.5	accuracy:0.6428571428571429
+	method:mean	missing_rate:0.5	accuracy:0.6285714285714286
+	method:mean	missing_rate:0.5	accuracy:0.6285714285714286
+	method:mean	missing_rate:0.5	accuracy:0.6428571428571429
+	method:mean	missing_rate:0.5	accuracy:0.6285714285714286
+	method:mean	missing_rate:0.5	accuracy:0.6285714285714286
+	method:mean	missing_rate:0.5	accuracy:0.6571428571428571
+	method:mean	missing_rate:0.5	accuracy:0.6285714285714286
+	method:mean	missing_rate:0.5	accuracy:0.6285714285714286
+(0.6571428571428571+0.6428571428571429+0.6428571428571429)/3 = 0.647619047619047633333333333
+
